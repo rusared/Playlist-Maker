@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <FrameLayout
@@ -22,9 +22,9 @@
             <Button
                 android:layout_width="48dp"
                 android:layout_height="match_parent"
-                android:backgroundTint="#FFFFFF"
+                android:backgroundTint="@color/white"
                 app:icon="@drawable/arrow_back_icon"
-                app:iconTint="#1A1B22"
+                app:iconTint="@color/settings_title_color"
                 android:layout_gravity="start|center_vertical"
                 android:background="@null" />
 
@@ -32,8 +32,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginRight="48dp"
-                android:text="Настройки"
-                android:textColor="#1A1B22"
+                android:text="@string/settings_title"
+                android:textColor="@color/settings_title_color"
                 android:textSize="26sp"
                 android:gravity="start|center_vertical"
                 android:paddingStart="12dp"
@@ -43,15 +43,15 @@
     
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="61dp"
+        android:layout_height="@dimen/settings_button_dimen"
         android:layout_marginTop="24dp"
         android:orientation="horizontal" >
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Темная тема"
-            android:textColor="#000000"
+            android:text="@string/settings_text1"
+            android:textColor="@color/settings_text_color"
             android:textSize="16sp"
             android:layout_marginVertical="21dp"
             android:layout_marginStart="16dp"
@@ -65,21 +65,20 @@
             android:layout_marginBottom="11dp"
             android:layout_gravity="end"
             android:src="@drawable/switch_off_icon"
-            app:tint="#AEAFB4"
+            app:tint="@color/settings_icon_color"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
     </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="61dp"
-        android:layout_marginTop="24dp"
+        android:layout_height="@dimen/settings_button_dimen"
         android:orientation="horizontal" >
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Поделиться приложением"
-            android:textColor="#000000"
+            android:text="@string/settings_text2"
+            android:textColor="@color/settings_text_color"
             android:textSize="16sp"
             android:layout_marginVertical="21dp"
             android:layout_marginStart="16dp"
@@ -93,20 +92,19 @@
             android:layout_marginBottom="19dp"
             android:layout_gravity="end"
             android:src="@drawable/share_icon"
-            app:tint="#AEAFB4" />
+            app:tint="@color/settings_icon_color" />
     </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="61dp"
-        android:layout_marginTop="24dp"
+        android:layout_height="@dimen/settings_button_dimen"
         android:orientation="horizontal" >
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Написать в поддержку"
-            android:textColor="#000000"
+            android:text="@string/settings_text3"
+            android:textColor="@color/settings_text_color"
             android:textSize="16sp"
             android:layout_marginVertical="21dp"
             android:layout_marginStart="16dp"
@@ -120,20 +118,19 @@
             android:layout_marginBottom="19dp"
             android:layout_gravity="end"
             android:src="@drawable/support_icon"
-            app:tint="#AEAFB4" />
+            app:tint="@color/settings_icon_color" />
     </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="61dp"
-        android:layout_marginTop="24dp"
+        android:layout_height="@dimen/settings_button_dimen"
         android:orientation="horizontal" >
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Пользовательское соглашение"
-            android:textColor="#000000"
+            android:text="@string/settings_text4"
+            android:textColor="@color/settings_text_color"
             android:textSize="16sp"
             android:layout_marginVertical="21dp"
             android:layout_marginStart="16dp"
@@ -147,6 +144,6 @@
             android:layout_marginBottom="19dp"
             android:layout_gravity="end"
             android:src="@drawable/arrow_forward_icon"
-            app:tint="#AEAFB4" />
+            app:tint="@color/settings_icon_color" />
     </FrameLayout>
 </LinearLayout>

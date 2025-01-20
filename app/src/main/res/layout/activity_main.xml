@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/main_background_color"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/main">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -25,7 +26,7 @@
                     <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Playlist maker"
+                    android:text="@string/main_title"
                     android:textColor="@color/white"
                     android:textSize="22sp" />
                 </FrameLayout>
@@ -33,7 +34,7 @@
         </FrameLayout>
 
     <Button
-        android:text="Поиск"
+        android:text="@string/main_button1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -41,14 +42,14 @@
         android:layout_marginHorizontal="16dp"
         app:cornerRadius="16dp"
         android:backgroundTint="@color/main_button_color"
-        android:textColor="@color/dark_text_color"
+        android:textColor="@color/main_text_color"
         app:icon="@drawable/search_icon"
         app:iconGravity="textStart"
         app:iconPadding="8dp"
-        app:iconTint="@color/dark_text_color" />
+        app:iconTint="@color/main_text_color" />
 
     <Button
-        android:text="Медиатека"
+        android:text="@string/main_button2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -56,14 +57,14 @@
         android:layout_marginHorizontal="16dp"
         app:cornerRadius="16dp"
         android:backgroundTint="@color/main_button_color"
-        android:textColor="@color/dark_text_color"
+        android:textColor="@color/main_text_color"
         app:icon="@drawable/library_icon"
         app:iconGravity="textStart"
         app:iconPadding="8dp"
-        app:iconTint="@color/dark_text_color" />
+        app:iconTint="@color/main_text_color" />
 
     <Button
-        android:text="Настройки"
+        android:text="@string/main_button3"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -72,9 +73,9 @@
         android:layout_marginBottom="28dp"
         app:cornerRadius="16dp"
         android:backgroundTint="@color/main_button_color"
-        android:textColor="@color/dark_text_color"
+        android:textColor="@color/main_text_color"
         app:icon="@drawable/settings_icon"
         app:iconGravity="textStart"
         app:iconPadding="8dp"
-        app:iconTint="@color/dark_text_color" />
+        app:iconTint="@color/main_text_color" />
 </LinearLayout>
