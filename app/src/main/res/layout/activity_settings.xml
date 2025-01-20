@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:padding="4dp" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginRight="52dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:backgroundTint="#FFFFFF"
+                app:icon="@drawable/arrow_back_icon"
+                app:iconTint="#1A1B22"
+                android:layout_gravity="start|center_vertical"
+                android:background="@null" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginRight="48dp"
+                android:text="Настройки"
+                android:textColor="#1A1B22"
+                android:textSize="26sp"
+                android:gravity="start|center_vertical"
+                android:paddingStart="12dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </FrameLayout>
+    
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="61dp"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Темная тема"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:layout_marginVertical="21dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="44dp"/>
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginRight="6dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="11dp"
+            android:layout_gravity="end"
+            android:src="@drawable/switch_off_icon"
+            app:tint="#AEAFB4"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="61dp"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Поделиться приложением"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:layout_marginVertical="21dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="44dp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="19dp"
+            android:layout_gravity="end"
+            android:src="@drawable/share_icon"
+            app:tint="#AEAFB4" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="61dp"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Написать в поддержку"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:layout_marginVertical="21dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="44dp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="19dp"
+            android:layout_gravity="end"
+            android:src="@drawable/support_icon"
+            app:tint="#AEAFB4" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="61dp"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Пользовательское соглашение"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:layout_marginVertical="21dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="44dp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="19dp"
+            android:layout_gravity="end"
+            android:src="@drawable/arrow_forward_icon"
+            app:tint="#AEAFB4" />
+    </FrameLayout>
+</LinearLayout>
