@@ -48,7 +48,8 @@
         app:iconGravity="textStart"
         app:iconPadding="8dp"
         app:iconTint="@color/main_text_color"
-        android:foreground="?attr/selectableItemBackground" />
+        android:foreground="?attr/selectableItemBackground"
+        android:textAllCaps="false" />
 
     <Button
         android:id="@+id/library_button"
@@ -65,7 +66,8 @@
         app:iconGravity="textStart"
         app:iconPadding="8dp"
         app:iconTint="@color/main_text_color"
-        android:foreground="?attr/selectableItemBackground" />
+        android:foreground="?attr/selectableItemBackground"
+        android:textAllCaps="false" />
 
     <Button
         android:id="@+id/settings_button"
@@ -83,5 +85,6 @@
         app:iconGravity="textStart"
         app:iconPadding="8dp"
         app:iconTint="@color/main_text_color"
-        android:foreground="?attr/selectableItemBackground" />
+        android:foreground="?attr/selectableItemBackground"
+        android:textAllCaps="false" />
 </LinearLayout>
