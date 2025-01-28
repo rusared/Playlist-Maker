@@ -8,30 +8,15 @@
     android:orientation="vertical"
     android:id="@+id/main">
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:padding="4dp" >
+    <com.google.android.material.appbar.MaterialToolbar
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        app:title="@string/main_title"
+        app:titleTextAppearance="@style/MainTitleTextStyle"
+        app:titleTextColor="@color/white">
+    </com.google.android.material.appbar.MaterialToolbar>
 
-            <FrameLayout
-                android:layout_width="304dp"
-                android:layout_height="wrap_content" >
 
-                <FrameLayout
-                    android:layout_width="208dp"
-                    android:layout_height="48dp"
-                    android:paddingTop="10dp"
-                    android:paddingLeft="12dp" >
-
-                    <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/main_title"
-                    android:textColor="@color/white"
-                    android:textSize="22sp" />
-                </FrameLayout>
-            </FrameLayout>
-        </FrameLayout>
 
     <Button
         android:id="@+id/search_button"
