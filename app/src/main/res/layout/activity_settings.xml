@@ -16,14 +16,14 @@
         app:titleTextAppearance="@style/SettingsTitleTextStyle">
     </com.google.android.material.appbar.MaterialToolbar>
 
-
-<!--    android:layout_height="@dimen/settings_button_dimen"-->
     <com.google.android.material.switchmaterial.SwitchMaterial
-        android:layout_marginTop="24dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:paddingHorizontal="16dp"
         android:paddingVertical="20dp"
+        app:thumbTint="@color/switch_thumb_color"
+        app:trackTint="@color/switch_track_color"
         android:text="@string/settings_text1"
         android:textColor="@color/settings_text_color"
         android:textSize="16sp" />

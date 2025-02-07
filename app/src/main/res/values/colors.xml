@@ -10,4 +10,9 @@
     <color name="settings_title_color">#1A1B22</color>
     <color name="settings_text_color">#000000</color>
     <color name="settings_icon_color">#AEAFB4</color>
+
+    <color name="switch_thumb_active_color">#3772E7</color>
+    <color name="switch_thumb_inactive_color">#AEAFB4</color>
+    <color name="switch_track_active_color">#9FBBF3</color>
+    <color name="switch_track_inactive_color">#E6E8EB</color>
 </resources>

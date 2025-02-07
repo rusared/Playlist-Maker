@@ -16,8 +16,6 @@
         app:titleTextColor="@color/white">
     </com.google.android.material.appbar.MaterialToolbar>
 
-
-
     <Button
         android:id="@+id/search_button"
         android:text="@string/main_button1"
