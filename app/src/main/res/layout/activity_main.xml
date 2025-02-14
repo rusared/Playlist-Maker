@@ -2,72 +2,42 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:theme="@style/Theme.PlaylistMaker"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/main_background_color"
     android:orientation="vertical"
-    android:id="@+id/main">
+    android:background="?attr/main_background_color" >
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
         app:title="@string/main_title"
-        app:titleTextAppearance="@style/MainTitleTextStyle"
-        app:titleTextColor="@color/white">
+        style="@style/TitleStyle"
+        app:titleTextAppearance="@style/MainTitleStyle"
+        app:titleTextColor="@color/white" >
     </com.google.android.material.appbar.MaterialToolbar>
 
     <Button
         android:id="@+id/search_button"
         android:text="@string/main_button1"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
         android:layout_marginTop="@dimen/first_button_marginTop"
-        android:layout_marginHorizontal="@dimen/main_button_marginHorizontal"
-        app:cornerRadius="@dimen/main_button_cornerRadius"
-        android:backgroundTint="@color/main_button_color"
-        android:textColor="@color/main_text_color"
         app:icon="@drawable/search_icon"
-        app:iconGravity="textStart"
-        app:iconPadding="8dp"
-        app:iconTint="@color/main_text_color"
-        android:foreground="?attr/selectableItemBackground"
-        android:textAllCaps="false" />
+        style="@style/MainButtonStyle"
+        app:iconTint="@color/black_1A" />
 
     <Button
         android:id="@+id/library_button"
         android:text="@string/main_button2"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="@dimen/main_button_marginTop"
-        android:layout_marginHorizontal="@dimen/main_button_marginHorizontal"
-        app:cornerRadius="@dimen/main_button_cornerRadius"
-        android:backgroundTint="@color/main_button_color"
-        android:textColor="@color/main_text_color"
         app:icon="@drawable/library_icon"
-        app:iconGravity="textStart"
-        app:iconPadding="8dp"
-        app:iconTint="@color/main_text_color"
-        android:foreground="?attr/selectableItemBackground"
-        android:textAllCaps="false" />
+        style="@style/MainButtonStyle"
+        app:iconTint="@color/black_1A" />
 
     <Button
         android:id="@+id/settings_button"
         android:text="@string/main_button3"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="@dimen/main_button_marginTop"
-        android:layout_marginHorizontal="@dimen/main_button_marginHorizontal"
         android:layout_marginBottom="28dp"
-        app:cornerRadius="@dimen/main_button_cornerRadius"
-        android:backgroundTint="@color/main_button_color"
-        android:textColor="@color/main_text_color"
         app:icon="@drawable/settings_icon"
-        app:iconGravity="textStart"
-        app:iconPadding="8dp"
-        app:iconTint="@color/main_text_color"
-        android:foreground="?attr/selectableItemBackground"
-        android:textAllCaps="false" />
+        android:elevation="50dp"
+        style="@style/MainButtonStyle"
+        app:iconTint="@color/black_1A" />
+
 </LinearLayout>
