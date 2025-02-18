@@ -13,7 +13,7 @@
     <com.google.android.material.appbar.MaterialToolbar
         app:title="@string/main_title"
         style="@style/TitleStyle"
-        app:titleTextAppearance="@style/MainTitleStyle"
+        app:titleTextAppearance="@style/TitleStyle"
         app:titleTextColor="@color/white" >
     </com.google.android.material.appbar.MaterialToolbar>
 

@@ -4,10 +4,12 @@
 
         <item name="main_background_color">@color/black_1A</item>
 
-        <item name="settings_background_color">@color/black_1A</item>
-        <item name="settings_title_color">@color/white</item>
-        <item name="settings_text_color">@color/white</item>
-        <item name="settings_icon_color">@color/white</item>
+        <item name="background_color">@color/black_1A</item>
+        <item name="title_color">@color/white</item>
+        <item name="text_color">@color/white</item>
+        <item name="icon_color">@color/white</item>
+        <item name="editText_background_color">@color/white</item>
+        <item name="editText_hint_color">@color/black_1A</item>
 
     </style>
 </resources>

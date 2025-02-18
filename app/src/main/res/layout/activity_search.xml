@@ -1,10 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/search"
+    android:theme="@style/Theme.PlaylistMaker"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SearchActivity">
+    android:background="?attr/background_color"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true" >
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/search_back_button"
+        app:title="@string/search_title"
+        app:navigationIcon="@drawable/arrow_back_icon"
+        style="@style/TitleStyle"
+        app:titleTextAppearance="@style/TitleStyle"
+        app:titleTextColor="?attr/title_color"
+        app:navigationIconTint="?attr/title_color" >
+    </com.google.android.material.appbar.MaterialToolbar>
+
+
+    <FrameLayout
+        android:id="@+id/search_input_field"
+        android:theme="@style/Theme.PlaylistMaker"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="?attr/background_color"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="16dp" >
+
+        <EditText
+            android:id="@+id/input_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="10dp"
+            android:background="@drawable/edittext_form"
+            android:drawableStart="@drawable/search_icon"
+            android:drawablePadding="8dp"
+            android:drawableTint="?attr/editText_hint_color"
+            android:hint="@string/input_hint"
+            android:maxLength="50"
+            android:textSize="16sp"
+            android:textFontWeight="400"
+            android:fontFamily="@font/ys_display_regular"
+            android:maxLines="1"
+            android:inputType="text"
+            android:textColor="@color/black"
+            android:textColorHint="?attr/editText_hint_color" />
+
+        <ImageView
+            android:id="@+id/clear_icon"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:padding="8dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:background="@drawable/edittext_form"
+            android:visibility="gone" />
+    </FrameLayout>
+</LinearLayout>

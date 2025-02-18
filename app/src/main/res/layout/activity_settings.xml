@@ -6,7 +6,7 @@
     android:theme="@style/Theme.PlaylistMaker"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/settings_background_color"
+    android:background="?attr/background_color"
     android:orientation="vertical"
     android:fitsSystemWindows="true" >
 
@@ -15,9 +15,9 @@
         app:title="@string/settings_title"
         app:navigationIcon="@drawable/arrow_back_icon"
         style="@style/TitleStyle"
-        app:titleTextAppearance="@style/SettingsTitleStyle"
-        app:titleTextColor="?attr/settings_title_color"
-        app:navigationIconTint="?attr/settings_title_color" >
+        app:titleTextAppearance="@style/TitleStyle"
+        app:titleTextColor="?attr/title_color"
+        app:navigationIconTint="?attr/title_color" >
     </com.google.android.material.appbar.MaterialToolbar>
 
     <com.google.android.material.switchmaterial.SwitchMaterial

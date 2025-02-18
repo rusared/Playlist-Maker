@@ -3,11 +3,12 @@
     <style name="Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
 
         <item name="main_background_color">@color/blue</item>
-
-        <item name="settings_background_color">@color/white</item>
-        <item name="settings_title_color">@color/black_1A</item>
-        <item name="settings_text_color">@color/black_00</item>
-        <item name="settings_icon_color">@color/gray</item>
+        <item name="background_color">@color/white</item>
+        <item name="title_color">@color/black_1A</item>
+        <item name="text_color">@color/black_00</item>
+        <item name="icon_color">@color/grayAE</item>
+        <item name="editText_background_color">@color/grayE6</item>
+        <item name="editText_hint_color">@color/grayAE</item>
 
     </style>
 </resources>
