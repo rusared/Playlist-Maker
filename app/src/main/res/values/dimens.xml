@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="settings_button_dimen">60dp</dimen>
+
+    <dimen name="first_button_marginTop">24dp</dimen>
+
+    <dimen name="main_button_marginTop">16dp</dimen>
+    <dimen name="main_button_marginHorizontal">16dp</dimen>
+    <dimen name="main_button_cornerRadius">16dp</dimen>
+
+    <dimen name="settings_button_paddingHorizontal">16dp</dimen>
+    <dimen name="settings_button_paddingVertical">20dp</dimen>
+
+</resources>

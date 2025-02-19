@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="MainTitleTextStyle">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="SettingsTitleTextStyle">
+        <item name="android:textColor">@color/settings_title_color</item>
+        <item name="android:textSize">26sp</item>
+    </style>
+</resources>
