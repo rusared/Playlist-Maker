@@ -10,15 +10,19 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.appbar.MaterialToolbar
 
 class SearchActivity : AppCompatActivity() {
+
+    private var valueEditText: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
         val backButton = findViewById<MaterialToolbar>(R.id.search_back_button)
         setSupportActionBar(backButton)
-
         val inputEditText = findViewById<EditText>(R.id.input_edit_text)
         val clearButton = findViewById<ImageView>(R.id.clear_icon)
+
+        inputEditText.setText(valueEditText)
 
         clearButton.setOnClickListener {
             inputEditText.setText("")
@@ -34,22 +38,37 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // empty
                 clearButton.visibility = clearButtonVisibility(s)
+                valueEditText = s?.toString()
             }
 
             override fun afterTextChanged(s: Editable?) {
                 // empty
             }
         }
-        inputEditText.addTextChangedListener(simpleTextWatcher)
-    }
 
+        inputEditText.addTextChangedListener(simpleTextWatcher)
+
+    }
     private fun clearButtonVisibility(s: CharSequence?): Int {
         return if (s.isNullOrEmpty()) {
             View.GONE
         } else {
             View.VISIBLE
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(VALUE_EDIT_TEXT, valueEditText)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        valueEditText = savedInstanceState.getString(VALUE_EDIT_TEXT)
+    }
+
+    companion object {
+        private const val VALUE_EDIT_TEXT = "value_edit_text"
     }
 }
