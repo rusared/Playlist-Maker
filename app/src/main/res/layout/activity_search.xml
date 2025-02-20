@@ -12,13 +12,13 @@
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/search_back_button"
-        app:title="@string/search_title"
-        app:navigationIcon="@drawable/arrow_back_icon"
         style="@style/TitleStyle"
+        android:layout_height="wrap_content"
+        app:navigationIcon="@drawable/arrow_back_icon"
+        app:navigationIconTint="?attr/title_color"
+        app:title="@string/search_title"
         app:titleTextAppearance="@style/TitleStyle"
-        app:titleTextColor="?attr/title_color"
-        app:navigationIconTint="?attr/title_color" >
-    </com.google.android.material.appbar.MaterialToolbar>
+        app:titleTextColor="?attr/title_color"/>
 
 
     <FrameLayout
@@ -55,9 +55,11 @@
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:layout_gravity="end"
-            android:padding="8dp"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:background="@drawable/edittext_form"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="12dp"
+            android:src="@drawable/clear_icon"
+            app:tint="?attr/editText_hint_color"
             android:visibility="gone" />
+
     </FrameLayout>
 </LinearLayout>

@@ -22,8 +22,6 @@ class SearchActivity : AppCompatActivity() {
         val inputEditText = findViewById<EditText>(R.id.input_edit_text)
         val clearButton = findViewById<ImageView>(R.id.clear_icon)
 
-        inputEditText.setText(valueEditText)
-
         clearButton.setOnClickListener {
             inputEditText.setText("")
         }
@@ -66,6 +64,8 @@ class SearchActivity : AppCompatActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         valueEditText = savedInstanceState.getString(VALUE_EDIT_TEXT)
+        val inputEditText = findViewById<EditText>(R.id.input_edit_text)
+        inputEditText.setText(valueEditText)
     }
 
     companion object {
