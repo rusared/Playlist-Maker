@@ -20,15 +20,14 @@
         app:titleTextAppearance="@style/TitleStyle"
         app:titleTextColor="?attr/title_color"/>
 
-
     <FrameLayout
         android:id="@+id/search_input_field"
         android:theme="@style/Theme.PlaylistMaker"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="?attr/background_color"
+        android:layout_height="52dp"
+        android:paddingHorizontal="16dp"
         android:paddingVertical="8dp"
-        android:paddingHorizontal="16dp" >
+        android:background="?attr/background_color" >
 
         <EditText
             android:id="@+id/input_edit_text"
@@ -55,8 +54,8 @@
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:layout_gravity="end"
-            android:paddingHorizontal="14dp"
-            android:paddingVertical="12dp"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="10dp"
             android:src="@drawable/clear_icon"
             app:tint="?attr/editText_hint_color"
             android:visibility="gone" />
