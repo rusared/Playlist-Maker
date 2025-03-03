@@ -9,6 +9,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 
 class SearchActivity : AppCompatActivity() {
@@ -50,6 +52,13 @@ class SearchActivity : AppCompatActivity() {
         }
 
         inputEditText.addTextChangedListener(simpleTextWatcher)
+
+        val recycler = findViewById<RecyclerView>(R.id.tracksList)
+        val tracks = listOf(
+            Track("Smells Like Teen Spirit", "Nirvana", "5:01", "https://is5-ssl.mzstatic.com/image/thumb/Music115/v4/7b/58/c2/7b58c21a-2b51-2bb2-e59a-9bb9b96ad8c3/00602567924166.rgb.jpg/100x100bb.jpg")
+        )
+        recycler.layoutManager = LinearLayoutManager(this)
+        recycler.adapter = TrackAdapter(tracks)
 
     }
     private fun clearButtonVisibility(s: CharSequence?): Int {
