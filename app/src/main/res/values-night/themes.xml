@@ -3,13 +3,15 @@
     <style name="Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
 
         <item name="main_background_color">@color/black_1A</item>
-
         <item name="background_color">@color/black_1A</item>
         <item name="title_color">@color/white</item>
-        <item name="text_color">@color/white</item>
-        <item name="icon_color">@color/white</item>
+        <item name="settings_button_text_color">@color/white</item>
+        <item name="settings_button_icon_color">@color/white</item>
         <item name="editText_background_color">@color/white</item>
         <item name="editText_hint_color">@color/black_1A</item>
+        <item name="search_track_view_text_top_color">@color/white</item>
+        <item name="search_track_view_text_bottom_color">@color/white</item>
+        <item name="search_arrow_forward_icon_color">@color/white</item>
 
     </style>
 </resources>

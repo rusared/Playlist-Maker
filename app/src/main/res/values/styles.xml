@@ -34,12 +34,31 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingHorizontal">@dimen/settings_button_paddingHorizontal</item>
         <item name="android:paddingVertical">@dimen/settings_button_paddingVertical</item>
-        <item name="android:textColor">?attr/text_color</item>
+        <item name="android:textColor">?attr/settings_button_text_color</item>
         <item name="android:textSize">16sp</item>
         <item name="android:fontFamily">@font/ys_display_regular</item>
         <item name="android:textFontWeight">400</item>
-        <item name="drawableTint">?attr/icon_color</item>
+        <item name="drawableTint">?attr/settings_button_icon_color</item>
 
+    </style>
+    
+    <style name="SearchTrackViewStyle">
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLength">70</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="SearchTrackViewTextTopStyle" parent="SearchTrackViewStyle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?attr/search_track_view_text_top_color</item>
+    </style>
+
+    <style name="SearchTrackViewTextBottomStyle" parent="SearchTrackViewStyle">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">?attr/search_track_view_text_bottom_color</item>
+        <item name="drawableTint">?attr/search_track_view_text_bottom_color</item>
     </style>
 
 </resources>

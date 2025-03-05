@@ -11,7 +11,8 @@
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_marginVertical="8dp"
-        android:layout_marginLeft="13dp" />
+        android:layout_marginLeft="13dp"
+        tools:src="@drawable/album_placeholder"/>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -25,40 +26,31 @@
             android:id="@+id/tvTrackName"
             android:layout_width="match_parent"
             android:layout_height="19dp"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:textSize="16sp"
-            android:textColor="@color/black_00"
-            tools:text="Yesterday (Remastered 2009)" />
+            style="@style/SearchTrackViewTextTopStyle"
+            tools:text="Yesterday (Remastered 2009) длииииииииииииииииииииииииииинный" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="13dp"
             android:orientation="horizontal"
-            android:layout_marginTop="1dp"
-            android:layout_marginBottom="0dp"
-            android:padding="0dp">
+            android:layout_marginTop="1dp">
 
             <TextView
                 android:id="@+id/tvArtistName"
                 android:layout_width="wrap_content"
                 android:layout_height="13dp"
-                android:layout_marginRight="77dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textSize="11sp"
-                android:textColor="@color/grayAE"
-                tools:text="The Beatles" />
+                android:layout_marginEnd="77dp"
+                style="@style/SearchTrackViewTextBottomStyle"
+                tools:text="The Beatles длииииииииииииииииииииииииииинный" />
 
             <TextView
                 android:id="@+id/tvTrackTime"
-                android:layout_width="wrap_content"
+                android:layout_width="77dp"
                 android:layout_height="13dp"
-                android:layout_marginLeft="-77dp"
+                android:layout_marginStart="-78dp"
                 android:drawableLeft="@drawable/dot_icon"
-                android:textSize="11sp"
-                android:textColor="@color/grayAE"
-                tools:text="2:55" />
+                style="@style/SearchTrackViewTextBottomStyle"
+                tools:text="2:55 длииииииииииииииииииииииииииинный" />
 
         </LinearLayout>
 
@@ -72,7 +64,8 @@
         android:layout_marginTop="18dp"
         android:layout_marginBottom="19dp"
         android:layout_marginEnd="12dp"
-        app:srcCompat="@drawable/arrow_forward_icon" />
+        app:srcCompat="@drawable/arrow_forward_icon"
+        app:tint="?attr/search_arrow_forward_icon_color" />
 
     </LinearLayout>
 
