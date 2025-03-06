@@ -25,7 +25,7 @@
         android:theme="@style/Theme.PlaylistMaker"
         android:layout_width="match_parent"
         android:layout_height="52dp"
-        android:paddingHorizontal="16dp"
+        android:paddingHorizontal="@dimen/display_regular_paddingHorizontal"
         android:paddingVertical="8dp"
         android:background="?attr/background_color" >
 
@@ -33,12 +33,11 @@
             android:id="@+id/input_edit_text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="10dp"
+            android:paddingHorizontal="@dimen/view_regular_paddingHorizontal"
             android:background="@drawable/edittext_form"
             android:drawableStart="@drawable/search_icon"
-            android:drawablePadding="8dp"
-            android:paddingEnd="40dp"
+            android:drawablePadding="@dimen/icon_to_text_padding"
+            android:paddingEnd="@dimen/clear_icon_width"
             android:drawableTint="?attr/editText_hint_color"
             android:hint="@string/input_hint"
             android:maxLength="50"
@@ -53,11 +52,10 @@
 
         <ImageView
             android:id="@+id/clear_icon"
-            android:layout_width="40dp"
+            android:layout_width="@dimen/clear_icon_width"
             android:layout_height="match_parent"
             android:layout_gravity="end"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="10dp"
+            android:paddingHorizontal="@dimen/view_regular_paddingHorizontal"
             android:src="@drawable/clear_icon"
             app:tint="?attr/editText_hint_color"
             android:visibility="gone" />
@@ -68,5 +66,5 @@
         android:id="@+id/tracksList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="@dimen/view_regular_marginTop" />
 </LinearLayout>
