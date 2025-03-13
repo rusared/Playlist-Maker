@@ -3,8 +3,11 @@
     <attr name="main_background_color" format="color" />
     <attr name="background_color" format="color" />
     <attr name="title_color" format="color" />
-    <attr name="text_color" format="color" />
-    <attr name="icon_color" format="color" />
+    <attr name="settings_button_text_color" format="color" />
+    <attr name="settings_button_icon_color" format="color" />
     <attr name="editText_background_color" format="color" />
     <attr name="editText_hint_color" format="color" />
+    <attr name="search_track_view_text_top_color" format="color" />
+    <attr name="search_track_view_text_bottom_color" format="color" />
+    <attr name="search_arrow_forward_icon_color" format="color" />
 </resources>
