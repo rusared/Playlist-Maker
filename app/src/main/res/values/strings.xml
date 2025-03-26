@@ -21,7 +21,7 @@
     <string name="search_title">Поиск</string>
     <string name="input_hint">Поиск</string>
     <string name="nothing_found">Ничего не нашлось</string>
-    <string name="connection_problem">Проблемы со связью&#10;&#10;Загрузка не удалась. Проверьте подключение к интернету</string>
+    <string name="connection_problem">Проблемы со связью\n\nЗагрузка не удалась. Проверьте\nподключение к интернету</string>
     <string name="update_button_text">Обновить</string>
 
 </resources>

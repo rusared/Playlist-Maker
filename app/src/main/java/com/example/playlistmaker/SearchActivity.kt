@@ -8,6 +8,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -40,6 +41,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var placeholderMessage: LinearLayout
     private lateinit var placeholderMessageImage: ImageView
     private lateinit var placeholderMessageText: TextView
+    private lateinit var placeholderMessageButton: Button
     private lateinit var tracksList: RecyclerView
 
 
@@ -58,10 +60,14 @@ class SearchActivity : AppCompatActivity() {
         placeholderMessage = findViewById(R.id.ll_placeholder_message)
         placeholderMessageImage = findViewById(R.id.iv_placeholder_message)
         placeholderMessageText = findViewById(R.id.tv_placeholder_message)
+        placeholderMessageButton = findViewById(R.id.b_placeholder_message)
         tracksList = findViewById(R.id.rv_tracks_list)
 
         clearButton.setOnClickListener {
             queryInput.setText("")
+            tracks.clear()
+            adapter.notifyDataSetChanged()
+            placeholderMessage.visibility = View.GONE
             val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(queryInput.windowToken, 0)
         }
@@ -104,18 +110,18 @@ class SearchActivity : AppCompatActivity() {
                                     adapter.notifyDataSetChanged()
                                 }
                                 if (tracks.isEmpty()) {
-                                    showMessage(getString(R.string.nothing_found), getDrawable(R.drawable.nothing_found_placeholder))
+                                    showMessage(getString(R.string.nothing_found), getDrawable(R.drawable.nothing_found_placeholder), false)
                                 } else {
-                                    showMessage("", null)
+                                    showMessage("", null, false)
                                 }
                             } else {
-                                showMessage(getString(R.string.connection_problem), getDrawable(R.drawable.connection_problem_placeholder))
+                                showMessage(getString(R.string.connection_problem), getDrawable(R.drawable.connection_problem_placeholder), true)
 //                                showMessage(getString(R.string.connection_problem), response.code().toString())
                             }
                         }
 
                         override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
-                            showMessage(getString(R.string.connection_problem), getDrawable(R.drawable.connection_problem_placeholder))
+                            showMessage(getString(R.string.connection_problem), getDrawable(R.drawable.connection_problem_placeholder), true)
 //                            showMessage(getString(R.string.connection_problem), t.message.toString())
                         }
 
@@ -144,9 +150,6 @@ class SearchActivity : AppCompatActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         valueEditText = savedInstanceState.getString(VALUE_EDIT_TEXT)
-//        val inputEditText = findViewById<EditText>(R.id.et_query_input)
-//        inputEditText.setText(valueEditText)
-//        queryInput = findViewById(R.id.et_query_input)
         queryInput.setText(valueEditText)
     }
 
@@ -154,15 +157,17 @@ class SearchActivity : AppCompatActivity() {
         private const val VALUE_EDIT_TEXT = "value_edit_text"
     }
 
-    private fun showMessage(text: String, image: Drawable?) {
+    private fun showMessage(text: String, image: Drawable?, isUpdater: Boolean) {
         if (text.isNotEmpty()) {
             placeholderMessage.visibility = View.VISIBLE
             tracks.clear()
             adapter.notifyDataSetChanged()
             placeholderMessageImage.setImageDrawable(image)
             placeholderMessageText.text = text
+            if (isUpdater) placeholderMessageButton.visibility = View.VISIBLE
         } else {
             placeholderMessage.visibility = View.GONE
+            if (!isUpdater) placeholderMessageButton.visibility = View.GONE
         }
     }
 }
