@@ -1,7 +1,6 @@
 package com.example.playlistmaker
 
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -14,7 +13,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
@@ -101,8 +99,7 @@ class SearchActivity : AppCompatActivity() {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 if (queryInput.text.isNotEmpty()) {
                     iTunesService.search(queryInput.text.toString()).enqueue(object : Callback<TracksResponse> {
-                        override fun onResponse(call: Call<TracksResponse>,
-                                                response: Response<TracksResponse>) {
+                        override fun onResponse(call: Call<TracksResponse>, response: Response<TracksResponse>) {
                             if (response.code() == 200) {
                                 tracks.clear()
                                 if (response.body()?.results?.isNotEmpty() == true) {
@@ -110,21 +107,17 @@ class SearchActivity : AppCompatActivity() {
                                     adapter.notifyDataSetChanged()
                                 }
                                 if (tracks.isEmpty()) {
-                                    showMessage(getString(R.string.nothing_found), getDrawable(R.drawable.nothing_found_placeholder), false)
-                                } else {
-                                    showMessage("", null, false)
+                                    showMessage(getString(R.string.nothing_found))
+                                }else {
+                                    showMessage("")
                                 }
                             } else {
-                                showMessage(getString(R.string.connection_problem), getDrawable(R.drawable.connection_problem_placeholder), true)
-//                                showMessage(getString(R.string.connection_problem), response.code().toString())
+                                showMessage(getString(R.string.connection_problem))
                             }
                         }
-
                         override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
-                            showMessage(getString(R.string.connection_problem), getDrawable(R.drawable.connection_problem_placeholder), true)
-//                            showMessage(getString(R.string.connection_problem), t.message.toString())
+                            showMessage(getString(R.string.connection_problem))
                         }
-
                     })
                 }
                 true
@@ -145,29 +138,44 @@ class SearchActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(VALUE_EDIT_TEXT, valueEditText)
+        outState.putSerializable(TRACKS, tracks)
+        outState.putString(PLACEHOLDER_TEXT, placeholderMessageText.text.toString())
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         valueEditText = savedInstanceState.getString(VALUE_EDIT_TEXT)
         queryInput.setText(valueEditText)
+        tracks.clear()
+        val savedTracks = savedInstanceState.getSerializable(TRACKS) as? ArrayList<Track>
+        if (savedTracks != null) {
+            tracks.addAll(savedTracks)
+        }
+        val placeholderText = savedInstanceState.getString(PLACEHOLDER_TEXT)
+        showMessage(placeholderText ?: "")
     }
 
     companion object {
         private const val VALUE_EDIT_TEXT = "value_edit_text"
+        private const val TRACKS = "trakcs"
+        private const val PLACEHOLDER_TEXT = "placeholder_text"
     }
 
-    private fun showMessage(text: String, image: Drawable?, isUpdater: Boolean) {
+    private fun showMessage(text: String) {
         if (text.isNotEmpty()) {
             placeholderMessage.visibility = View.VISIBLE
             tracks.clear()
             adapter.notifyDataSetChanged()
-            placeholderMessageImage.setImageDrawable(image)
             placeholderMessageText.text = text
-            if (isUpdater) placeholderMessageButton.visibility = View.VISIBLE
+            if (text == getString(R.string.nothing_found)) {
+                placeholderMessageImage.setImageDrawable(getDrawable(R.drawable.nothing_found_placeholder))
+                placeholderMessageButton.visibility = View.GONE
+            } else if (text == getString(R.string.connection_problem)) {
+                placeholderMessageImage.setImageDrawable(getDrawable(R.drawable.connection_problem_placeholder))
+                placeholderMessageButton.visibility = View.VISIBLE
+            }
         } else {
             placeholderMessage.visibility = View.GONE
-            if (!isUpdater) placeholderMessageButton.visibility = View.GONE
         }
     }
 }
