@@ -72,6 +72,10 @@ class SearchActivity : AppCompatActivity() {
             inputMethodManager?.hideSoftInputFromWindow(queryInput.windowToken, 0)
         }
 
+        placeholderMessageButton.setOnClickListener {
+            responseHandler()
+        }
+
         backButton.setNavigationOnClickListener {
             finish()
         }
@@ -93,44 +97,47 @@ class SearchActivity : AppCompatActivity() {
 
         queryInput.addTextChangedListener(simpleTextWatcher)
 
-
         tracksList.layoutManager = LinearLayoutManager(this)
         tracksList.adapter = adapter
 
         queryInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 if (queryInput.text.isNotEmpty()) {
-                    iTunesService.search(queryInput.text.toString()).enqueue(object : Callback<TracksResponse> {
-                        override fun onResponse(call: Call<TracksResponse>, response: Response<TracksResponse>) {
-                            if (response.code() == 200) {
-                                tracks.clear()
-                                if (response.body()?.results?.isNotEmpty() == true) {
-                                    tracks.addAll(response.body()?.results!!)
-                                    adapter.notifyDataSetChanged()
-                                }
-                                if (tracks.isEmpty()) {
-                                    currentRequestStatus = RequestStatus.NOTHING_FOUND
-                                    showMessage(currentRequestStatus)
-                                }else {
-                                    currentRequestStatus = RequestStatus.SUCCESS
-                                    showMessage(currentRequestStatus)
-                                }
-                            } else {
-                                currentRequestStatus = RequestStatus.CONNECTION_PROBLEM
-                                showMessage(currentRequestStatus)
-                            }
-                        }
-                        override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
-                            currentRequestStatus = RequestStatus.CONNECTION_PROBLEM
-                            showMessage(currentRequestStatus)
-                        }
-                    })
+                    responseHandler()
                 }
                 true
             }
             false
         }
 
+    }
+
+    private fun responseHandler() {
+        iTunesService.search(queryInput.text.toString()).enqueue(object : Callback<TracksResponse> {
+            override fun onResponse(call: Call<TracksResponse>, response: Response<TracksResponse>) {
+                if (response.code() == 200) {
+                    tracks.clear()
+                    if (response.body()?.results?.isNotEmpty() == true) {
+                        tracks.addAll(response.body()?.results!!)
+                        adapter.notifyDataSetChanged()
+                    }
+                    if (tracks.isEmpty()) {
+                        currentRequestStatus = RequestStatus.NOTHING_FOUND
+                        showMessage(currentRequestStatus)
+                    }else {
+                        currentRequestStatus = RequestStatus.SUCCESS
+                        showMessage(currentRequestStatus)
+                    }
+                } else {
+                    currentRequestStatus = RequestStatus.CONNECTION_PROBLEM
+                    showMessage(currentRequestStatus)
+                }
+            }
+            override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
+                currentRequestStatus = RequestStatus.CONNECTION_PROBLEM
+                showMessage(currentRequestStatus)
+            }
+        })
     }
 
     private fun clearButtonVisibility(s: CharSequence?): Int {
