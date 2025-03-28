@@ -1,7 +1,9 @@
 package com.example.playlistmaker
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -41,11 +43,11 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var placeholderMessageText: TextView
     private lateinit var placeholderMessageButton: Button
     private lateinit var tracksList: RecyclerView
+    private lateinit var currentRequestStatus: RequestStatus
 
-
+    private var valueEditText: String? = null
     private val tracks = ArrayList<Track>()
     private val adapter = TracksAdapter(tracks)
-    private var valueEditText: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,16 +109,20 @@ class SearchActivity : AppCompatActivity() {
                                     adapter.notifyDataSetChanged()
                                 }
                                 if (tracks.isEmpty()) {
-                                    showMessage(getString(R.string.nothing_found))
+                                    currentRequestStatus = RequestStatus.NOTHING_FOUND
+                                    showMessage(currentRequestStatus)
                                 }else {
-                                    showMessage("")
+                                    currentRequestStatus = RequestStatus.SUCCESS
+                                    showMessage(currentRequestStatus)
                                 }
                             } else {
-                                showMessage(getString(R.string.connection_problem))
+                                currentRequestStatus = RequestStatus.CONNECTION_PROBLEM
+                                showMessage(currentRequestStatus)
                             }
                         }
                         override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
-                            showMessage(getString(R.string.connection_problem))
+                            currentRequestStatus = RequestStatus.CONNECTION_PROBLEM
+                            showMessage(currentRequestStatus)
                         }
                     })
                 }
@@ -128,18 +134,14 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun clearButtonVisibility(s: CharSequence?): Int {
-        return if (s.isNullOrEmpty()) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
+        return if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(VALUE_EDIT_TEXT, valueEditText)
         outState.putSerializable(TRACKS, tracks)
-        outState.putString(PLACEHOLDER_TEXT, placeholderMessageText.text.toString())
+        outState.putString(CURRENT_REQUEST_STATUS, currentRequestStatus.name)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -151,31 +153,46 @@ class SearchActivity : AppCompatActivity() {
         if (savedTracks != null) {
             tracks.addAll(savedTracks)
         }
-        val placeholderText = savedInstanceState.getString(PLACEHOLDER_TEXT)
-        showMessage(placeholderText ?: "")
+        currentRequestStatus = RequestStatus.valueOf(savedInstanceState.getString(CURRENT_REQUEST_STATUS).toString())
+        showMessage(currentRequestStatus)
     }
 
     companion object {
         private const val VALUE_EDIT_TEXT = "value_edit_text"
-        private const val TRACKS = "trakcs"
-        private const val PLACEHOLDER_TEXT = "placeholder_text"
+        private const val TRACKS = "tracks"
+        private const val CURRENT_REQUEST_STATUS = "current_request_status"
     }
 
-    private fun showMessage(text: String) {
-        if (text.isNotEmpty()) {
-            placeholderMessage.visibility = View.VISIBLE
-            tracks.clear()
-            adapter.notifyDataSetChanged()
-            placeholderMessageText.text = text
-            if (text == getString(R.string.nothing_found)) {
+    enum class RequestStatus {
+        SUCCESS,
+        NOTHING_FOUND,
+        CONNECTION_PROBLEM
+    }
+
+    private fun showMessage(requestStatus: RequestStatus) {
+        when (requestStatus) {
+
+            RequestStatus.SUCCESS -> {
+                placeholderMessage.visibility = View.GONE
+            }
+
+            RequestStatus.NOTHING_FOUND -> {
+                placeholderMessage.visibility = View.VISIBLE
+                tracks.clear()
+                adapter.notifyDataSetChanged()
+                placeholderMessageText.text = getString(R.string.nothing_found)
                 placeholderMessageImage.setImageDrawable(getDrawable(R.drawable.nothing_found_placeholder))
                 placeholderMessageButton.visibility = View.GONE
-            } else if (text == getString(R.string.connection_problem)) {
+            }
+
+            RequestStatus.CONNECTION_PROBLEM -> {
+                placeholderMessage.visibility = View.VISIBLE
+                tracks.clear()
+                adapter.notifyDataSetChanged()
+                placeholderMessageText.text = getString(R.string.connection_problem)
                 placeholderMessageImage.setImageDrawable(getDrawable(R.drawable.connection_problem_placeholder))
                 placeholderMessageButton.visibility = View.VISIBLE
             }
-        } else {
-            placeholderMessage.visibility = View.GONE
         }
     }
 }
