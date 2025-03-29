@@ -14,7 +14,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">0dp</item>
         <item name="android:layout_weight">1</item>
-        <item name="android:layout_marginTop">@dimen/view_regular_marginTop</item>
+        <item name="android:layout_marginTop">@dimen/view_regular_margin</item>
         <item name="android:layout_marginHorizontal">@dimen/display_regular_paddingHorizontal</item>
         <item name="android:backgroundTint">@color/white</item>
         <item name="android:textColor">@color/black_1A</item>
@@ -39,8 +39,8 @@
         <item name="android:fontFamily">@font/ys_display_regular</item>
         <item name="android:textFontWeight">400</item>
         <item name="drawableTint">?attr/settings_button_icon_color</item>
-
     </style>
+
     
     <style name="SearchTrackViewStyle">
         <item name="android:fontFamily">@font/ys_display_regular</item>
@@ -61,4 +61,30 @@
         <item name="drawableTint">?attr/search_track_view_text_bottom_color</item>
     </style>
 
+    <style name="SearchPlaceholderTextStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">19sp</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/search_placeholder_text_color</item>
+
+    </style>
+
+    <style name="OrdinaryButtonStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="cornerRadius">54dp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:backgroundTint">?attr/search_placeholder_button_tint_color</item>
+        <item name="android:textColor">?attr/search_placeholder_button_text_color</item>
+    </style>
 </resources>

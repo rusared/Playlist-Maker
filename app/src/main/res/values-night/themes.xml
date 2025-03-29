@@ -12,6 +12,9 @@
         <item name="search_track_view_text_top_color">@color/white</item>
         <item name="search_track_view_text_bottom_color">@color/white</item>
         <item name="search_arrow_forward_icon_color">@color/white</item>
+        <item name="search_placeholder_button_tint_color">@color/white</item>
+        <item name="search_placeholder_button_text_color">@color/black_1A</item>
+        <item name="search_placeholder_text_color">@color/white</item>
 
     </style>
 </resources>

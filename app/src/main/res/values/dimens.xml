@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="first_button_marginTop">24dp</dimen>
+    <dimen name="view_large_margin">24dp</dimen>
+    <dimen name="view_regular_margin">16dp</dimen>
     <dimen name="main_button_cornerRadius">16dp</dimen>
     <dimen name="settings_button_dimen">60dp</dimen>
     <dimen name="settings_button_paddingVertical">20dp</dimen>
     <dimen name="clear_icon_width">40dp</dimen>
     <dimen name="display_regular_paddingHorizontal">16dp</dimen>
-    <dimen name="view_regular_marginTop">16dp</dimen>
     <dimen name="view_regular_paddingHorizontal">12dp</dimen>
     <dimen name="icon_to_text_padding">8dp</dimen>
 
