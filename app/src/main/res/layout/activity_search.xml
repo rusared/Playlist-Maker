@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/search"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll_search"
     android:theme="@style/Theme.PlaylistMaker"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/background_color"
     android:orientation="vertical"
-    android:fitsSystemWindows="true" >
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/search_back_button"
+        android:id="@+id/mt_search_back_button"
         style="@style/TitleStyle"
         android:layout_height="wrap_content"
         app:navigationIcon="@drawable/arrow_back_icon"
@@ -21,7 +23,6 @@
         app:titleTextColor="?attr/title_color"/>
 
     <FrameLayout
-        android:id="@+id/search_input_field"
         android:theme="@style/Theme.PlaylistMaker"
         android:layout_width="match_parent"
         android:layout_height="52dp"
@@ -30,7 +31,7 @@
         android:background="?attr/background_color" >
 
         <EditText
-            android:id="@+id/input_edit_text"
+            android:id="@+id/et_query_input"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingHorizontal="@dimen/view_regular_paddingHorizontal"
@@ -48,10 +49,12 @@
             android:inputType="text"
             android:textColor="@color/black"
             android:textColorHint="?attr/editText_hint_color"
-            android:textCursorDrawable="@drawable/cursor_icon" />
+            android:textCursorDrawable="@drawable/cursor_icon"
+            android:imeOptions="actionDone"
+            android:singleLine="true" />
 
         <ImageView
-            android:id="@+id/clear_icon"
+            android:id="@+id/iv_clear_icon"
             android:layout_width="@dimen/clear_icon_width"
             android:layout_height="match_parent"
             android:layout_gravity="end"
@@ -59,12 +62,47 @@
             android:src="@drawable/clear_icon"
             app:tint="?attr/editText_hint_color"
             android:visibility="gone" />
-
     </FrameLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/tracksList"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/view_regular_marginTop" />
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_tracks_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/view_regular_margin" />
+
+        <LinearLayout
+            android:id="@+id/ll_placeholder_message"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/view_large_margin"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_gravity="center">
+
+            <ImageView
+                android:id="@+id/iv_placeholder_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                tools:src="@drawable/connection_problem_placeholder"/>
+
+            <TextView
+                android:id="@+id/tv_placeholder_message"
+                android:layout_marginTop="@dimen/view_regular_margin"
+                tools:text="@string/connection_problem"
+                style="@style/SearchPlaceholderTextStyle" />
+
+            <Button
+                android:id="@+id/b_placeholder_message"
+                android:layout_marginTop="@dimen/view_large_margin"
+                android:text="@string/update_button_text"
+                style="@style/OrdinaryButtonStyle"
+                android:visibility="gone"/>
+        </LinearLayout>
+
+    </FrameLayout>
 </LinearLayout>

@@ -23,7 +23,7 @@
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/settings_dark_switcher"
         android:text="@string/settings_dark_switcher_text"
-        android:layout_marginTop="@dimen/first_button_marginTop"
+        android:layout_marginTop="@dimen/view_large_margin"
         app:thumbTint="@color/switch_thumb_color"
         app:trackTint="@color/switch_track_color"
         style="@style/SettingsButtonStyle" />

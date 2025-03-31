@@ -20,7 +20,7 @@
     <Button
         android:id="@+id/main_search_button"
         android:text="@string/main_search_button_text"
-        android:layout_marginTop="@dimen/first_button_marginTop"
+        android:layout_marginTop="@dimen/view_large_margin"
         app:icon="@drawable/search_icon"
         style="@style/MainButtonStyle"
         app:iconTint="@color/black_1A" />

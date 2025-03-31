@@ -1,35 +1,79 @@
 package com.example.playlistmaker
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : AppCompatActivity() {
 
+    private val iTunesBaseUrl = "https://itunes.apple.com"
+
+    private val retrofit = Retrofit.Builder()
+        .baseUrl(iTunesBaseUrl)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    private val iTunesService = retrofit.create(ITunesSearchAPI::class.java)
+
+    private lateinit var backButton: MaterialToolbar
+    private lateinit var queryInput: EditText
+    private lateinit var clearButton: ImageView
+    private lateinit var placeholderMessage: LinearLayout
+    private lateinit var placeholderMessageImage: ImageView
+    private lateinit var placeholderMessageText: TextView
+    private lateinit var placeholderMessageButton: Button
+    private lateinit var tracksList: RecyclerView
+    private lateinit var currentRequestStatus: RequestStatus
+
     private var valueEditText: String? = null
+    private val tracks = ArrayList<Track>()
+    private val adapter = TracksAdapter(tracks)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        val backButton = findViewById<MaterialToolbar>(R.id.search_back_button)
+        backButton = findViewById(R.id.mt_search_back_button)
         setSupportActionBar(backButton)
-        val inputEditText = findViewById<EditText>(R.id.input_edit_text)
-        val clearButton = findViewById<ImageView>(R.id.clear_icon)
+        queryInput = findViewById(R.id.et_query_input)
+        clearButton = findViewById(R.id.iv_clear_icon)
+        placeholderMessage = findViewById(R.id.ll_placeholder_message)
+        placeholderMessageImage = findViewById(R.id.iv_placeholder_message)
+        placeholderMessageText = findViewById(R.id.tv_placeholder_message)
+        placeholderMessageButton = findViewById(R.id.b_placeholder_message)
+        tracksList = findViewById(R.id.rv_tracks_list)
 
         clearButton.setOnClickListener {
-            inputEditText.setText("")
+            queryInput.setText("")
+            tracks.clear()
+            adapter.notifyDataSetChanged()
+            placeholderMessage.visibility = View.GONE
             val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-            inputMethodManager?.hideSoftInputFromWindow(inputEditText.windowToken, 0)
+            inputMethodManager?.hideSoftInputFromWindow(queryInput.windowToken, 0)
+        }
+
+        placeholderMessageButton.setOnClickListener {
+            responseHandler()
         }
 
         backButton.setNavigationOnClickListener {
@@ -51,41 +95,111 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        inputEditText.addTextChangedListener(simpleTextWatcher)
+        queryInput.addTextChangedListener(simpleTextWatcher)
 
-        val recycler = findViewById<RecyclerView>(R.id.tracksList)
-        val tracks = listOf(
-            Track("Smells Like Teen Spirit", "Nirvana", "5:01", "https://is5-ssl.mzstatic.com/image/thumb/Music115/v4/7b/58/c2/7b58c21a-2b51-2bb2-e59a-9bb9b96ad8c3/00602567924166.rgb.jpg/100x100bb.jpg"),
-            Track("Billie Jean", "Michael Jackson", "4:35", "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/3d/9d/38/3d9d3811-71f0-3a0e-1ada-3004e56ff852/827969428726.jpg/100x100bb.jpg"),
-            Track("Stayin' Alive", "Bee Gees", "4:10", "https://is4-ssl.mzstatic.com/image/thumb/Music115/v4/1f/80/1f/1f801fc1-8c0f-ea3e-d3e5-387c6619619e/16UMGIM86640.rgb.jpg/100x100bb.jpg"),
-            Track("Whole Lotta Love", "Led Zeppelin", "5:33", "https://is2-ssl.mzstatic.com/image/thumb/Music62/v4/7e/17/e3/7e17e33f-2efa-2a36-e916-7f808576cf6b/mzm.fyigqcbs.jpg/100x100bb.jpg"),
-            Track("Sweet Child O'Mine", "Guns N' Roses", "5:03", "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/a0/4d/c4/a04dc484-03cc-02aa-fa82-5334fcb4bc16/18UMGIM24878.rgb.jpg/100x100bb.jpg")
-        )
-        recycler.layoutManager = LinearLayoutManager(this)
-        recycler.adapter = TrackAdapter(tracks)
+        tracksList.layoutManager = LinearLayoutManager(this)
+        tracksList.adapter = adapter
+
+        queryInput.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                if (queryInput.text.isNotEmpty()) {
+                    responseHandler()
+                }
+                true
+            }
+            false
+        }
 
     }
+
+    private fun responseHandler() {
+        iTunesService.search(queryInput.text.toString()).enqueue(object : Callback<TracksResponse> {
+            override fun onResponse(call: Call<TracksResponse>, response: Response<TracksResponse>) {
+                if (response.code() == 200) {
+                    tracks.clear()
+                    if (response.body()?.results?.isNotEmpty() == true) {
+                        tracks.addAll(response.body()?.results!!)
+                        adapter.notifyDataSetChanged()
+                    }
+                    if (tracks.isEmpty()) {
+                        currentRequestStatus = RequestStatus.NOTHING_FOUND
+                        showMessage(currentRequestStatus)
+                    }else {
+                        currentRequestStatus = RequestStatus.SUCCESS
+                        showMessage(currentRequestStatus)
+                    }
+                } else {
+                    currentRequestStatus = RequestStatus.CONNECTION_PROBLEM
+                    showMessage(currentRequestStatus)
+                }
+            }
+            override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
+                currentRequestStatus = RequestStatus.CONNECTION_PROBLEM
+                showMessage(currentRequestStatus)
+            }
+        })
+    }
+
     private fun clearButtonVisibility(s: CharSequence?): Int {
-        return if (s.isNullOrEmpty()) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
+        return if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(VALUE_EDIT_TEXT, valueEditText)
+        outState.putSerializable(TRACKS, tracks)
+        outState.putString(CURRENT_REQUEST_STATUS, currentRequestStatus.name)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         valueEditText = savedInstanceState.getString(VALUE_EDIT_TEXT)
-        val inputEditText = findViewById<EditText>(R.id.input_edit_text)
-        inputEditText.setText(valueEditText)
+        queryInput.setText(valueEditText)
+        tracks.clear()
+        val savedTracks = savedInstanceState.getSerializable(TRACKS) as? ArrayList<Track>
+        if (savedTracks != null) {
+            tracks.addAll(savedTracks)
+        }
+        currentRequestStatus = RequestStatus.valueOf(savedInstanceState.getString(CURRENT_REQUEST_STATUS).toString())
+        showMessage(currentRequestStatus)
     }
 
     companion object {
         private const val VALUE_EDIT_TEXT = "value_edit_text"
+        private const val TRACKS = "tracks"
+        private const val CURRENT_REQUEST_STATUS = "current_request_status"
+    }
+
+    enum class RequestStatus {
+        SUCCESS,
+        NOTHING_FOUND,
+        CONNECTION_PROBLEM
+    }
+
+    private fun showMessage(requestStatus: RequestStatus) {
+        when (requestStatus) {
+
+            RequestStatus.SUCCESS -> {
+                placeholderMessage.visibility = View.GONE
+            }
+
+            RequestStatus.NOTHING_FOUND -> {
+                placeholderMessage.visibility = View.VISIBLE
+                tracks.clear()
+                adapter.notifyDataSetChanged()
+                placeholderMessageText.text = getString(R.string.nothing_found)
+                placeholderMessageImage.setImageDrawable(getDrawable(R.drawable.nothing_found_placeholder))
+                placeholderMessageButton.visibility = View.GONE
+            }
+
+            RequestStatus.CONNECTION_PROBLEM -> {
+                placeholderMessage.visibility = View.VISIBLE
+                tracks.clear()
+                adapter.notifyDataSetChanged()
+                placeholderMessageText.text = getString(R.string.connection_problem)
+                placeholderMessageImage.setImageDrawable(getDrawable(R.drawable.connection_problem_placeholder))
+                placeholderMessageButton.visibility = View.VISIBLE
+            }
+        }
     }
 }
