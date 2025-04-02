@@ -3,8 +3,10 @@ package com.example.playlistmaker
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.CompoundButton
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
 
 class SettingsActivity : AppCompatActivity() {
@@ -12,21 +14,31 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        val backButton = findViewById<MaterialToolbar>(R.id.settings_back_button)
+        val backButton = findViewById<MaterialToolbar>(R.id.mt_back_button)
+        val themeSwitcher = findViewById<SwitchMaterial>(R.id.sm_theme_switcher)
+        val shareButton = findViewById<MaterialTextView>(R.id.mtv_share_button)
+        val supportButton = findViewById<MaterialTextView>(R.id.mtv_support_button)
+        val agreementButton = findViewById<MaterialTextView>(R.id.mtv_agreement_button)
+
         setSupportActionBar(backButton)
-        val shareButton = findViewById<MaterialTextView>(R.id.settings_share_button)
-        val supportButton = findViewById<MaterialTextView>(R.id.settings_support_button)
-        val agreementButton = findViewById<MaterialTextView>(R.id.settings_agreement_button)
 
         backButton.setNavigationOnClickListener {
             finish()
         }
+
+        themeSwitcher.isChecked = (application as App).darkTheme
+        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+            (applicationContext as App).switchTheme(checked)
+        }
+
         shareButton.setOnClickListener {
             shareApp()
         }
+
         supportButton.setOnClickListener {
             mailToSupport()
         }
+
         agreementButton.setOnClickListener {
             showUserAgreement()
         }
