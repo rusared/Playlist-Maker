@@ -35,10 +35,15 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var placeholderMessageButton: Button
     private lateinit var tracksList: RecyclerView
     private lateinit var currentRequestStatus: RequestStatus
+    private lateinit var tracksHistoryList: RecyclerView
+    private lateinit var historyView: LinearLayout
+    private lateinit var clearHistoryButton: Button
 
     private var valueEditText: String? = null
     private val tracks = ArrayList<Track>()
     private val adapter = TracksAdapter(tracks)
+    private val tracksHistory = ArrayList<Track>()
+    private val historyAdapter = TracksHistoryAdapter(tracksHistory)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

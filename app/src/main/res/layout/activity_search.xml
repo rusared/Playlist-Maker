@@ -81,7 +81,9 @@
             android:layout_marginHorizontal="@dimen/view_large_margin"
             android:orientation="vertical"
             android:gravity="center"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+            android:visibility="gone"
+            >
 
             <ImageView
                 android:id="@+id/iv_placeholder_message"
@@ -102,6 +104,35 @@
                 android:text="@string/update_button_text"
                 style="@style/OrdinaryButtonStyle"
                 android:visibility="gone"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_track_history"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="24dp"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="@string/track_history_title"
+                style="@style/SearchHistoryTitleStyle" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_track_history_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"/>
+
+            <Button
+                android:id="@+id/b_track_history_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:text="@string/clear_history"
+                style="@style/OrdinaryButtonStyle" />
         </LinearLayout>
 
     </FrameLayout>

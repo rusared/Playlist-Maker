@@ -13,4 +13,6 @@
     <attr name="search_placeholder_text_color" format="color" />
     <attr name="search_placeholder_button_tint_color" format="color" />
     <attr name="search_placeholder_button_text_color" format="color" />
+
+    <attr name="search_history_title_color" format="color" />
 </resources>
