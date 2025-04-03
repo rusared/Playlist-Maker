@@ -1,9 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -21,8 +19,6 @@ import com.google.android.material.appbar.MaterialToolbar
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : AppCompatActivity() {
 
@@ -34,20 +30,28 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var placeholderMessageText: TextView
     private lateinit var placeholderMessageButton: Button
     private lateinit var tracksList: RecyclerView
-    private lateinit var currentRequestStatus: RequestStatus
     private lateinit var tracksHistoryList: RecyclerView
+    private lateinit var currentRequestStatus: RequestStatus
     private lateinit var historyView: LinearLayout
     private lateinit var clearHistoryButton: Button
 
+    private lateinit var searchHistory: SearchHistory
+    private lateinit var tracksAdapter: TracksAdapter
+    private lateinit var tracksHistoryAdapter: TracksAdapter
+
     private var valueEditText: String? = null
     private val tracks = ArrayList<Track>()
-    private val adapter = TracksAdapter(tracks)
     private val tracksHistory = ArrayList<Track>()
-    private val historyAdapter = TracksHistoryAdapter(tracksHistory)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        searchHistory = SearchHistory().apply {
+            preferencesManager = PreferencesManager(this@SearchActivity)
+        }
+        tracksAdapter = TracksAdapter(tracks, searchHistory)
+        tracksHistoryAdapter = TracksAdapter(tracksHistory, searchHistory)
 
         backButton = findViewById(R.id.mt_search_back_button)
         setSupportActionBar(backButton)
@@ -58,11 +62,14 @@ class SearchActivity : AppCompatActivity() {
         placeholderMessageText = findViewById(R.id.tv_placeholder_message)
         placeholderMessageButton = findViewById(R.id.b_placeholder_message)
         tracksList = findViewById(R.id.rv_tracks_list)
+        tracksHistoryList = findViewById(R.id.rv_track_history_list)
+        historyView = findViewById(R.id.ll_track_history)
+        clearHistoryButton = findViewById(R.id.b_track_history_clear)
 
         clearButton.setOnClickListener {
             queryInput.setText("")
             tracks.clear()
-            adapter.notifyDataSetChanged()
+            tracksAdapter.notifyDataSetChanged()
             placeholderMessage.visibility = View.GONE
             val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(queryInput.windowToken, 0)
@@ -84,6 +91,7 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearButton.visibility = clearButtonVisibility(s)
                 valueEditText = s?.toString()
+                historyView.visibility = historyViewVisibility(s)
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -94,7 +102,9 @@ class SearchActivity : AppCompatActivity() {
         queryInput.addTextChangedListener(simpleTextWatcher)
 
         tracksList.layoutManager = LinearLayoutManager(this)
-        tracksList.adapter = adapter
+        tracksHistoryList.layoutManager = LinearLayoutManager(this)
+        tracksList.adapter = tracksAdapter
+        tracksHistoryList.adapter = tracksHistoryAdapter
 
         queryInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -106,6 +116,9 @@ class SearchActivity : AppCompatActivity() {
             false
         }
 
+        queryInput.setOnFocusChangeListener { view, hasFocus ->
+            historyView.visibility = if (hasFocus && queryInput.text.isEmpty()) View.VISIBLE else View.GONE
+        }
     }
 
     private fun responseHandler() {
@@ -115,7 +128,7 @@ class SearchActivity : AppCompatActivity() {
                     tracks.clear()
                     if (response.body()?.results?.isNotEmpty() == true) {
                         tracks.addAll(response.body()?.results!!)
-                        adapter.notifyDataSetChanged()
+                        tracksAdapter.notifyDataSetChanged()
                     }
                     if (tracks.isEmpty()) {
                         currentRequestStatus = RequestStatus.NOTHING_FOUND
@@ -134,6 +147,10 @@ class SearchActivity : AppCompatActivity() {
                 showMessage(currentRequestStatus)
             }
         })
+    }
+
+    private fun historyViewVisibility(s: CharSequence?): Int {
+        return if (queryInput.hasFocus() && s?.isEmpty() == true) View.VISIBLE else View.GONE
     }
 
     private fun clearButtonVisibility(s: CharSequence?): Int {
@@ -182,7 +199,7 @@ class SearchActivity : AppCompatActivity() {
             RequestStatus.NOTHING_FOUND -> {
                 placeholderMessage.visibility = View.VISIBLE
                 tracks.clear()
-                adapter.notifyDataSetChanged()
+                tracksAdapter.notifyDataSetChanged()
                 placeholderMessageText.text = getString(R.string.nothing_found)
                 placeholderMessageImage.setImageDrawable(getDrawable(R.drawable.nothing_found_placeholder))
                 placeholderMessageButton.visibility = View.GONE
@@ -191,7 +208,7 @@ class SearchActivity : AppCompatActivity() {
             RequestStatus.CONNECTION_PROBLEM -> {
                 placeholderMessage.visibility = View.VISIBLE
                 tracks.clear()
-                adapter.notifyDataSetChanged()
+                tracksAdapter.notifyDataSetChanged()
                 placeholderMessageText.text = getString(R.string.connection_problem)
                 placeholderMessageImage.setImageDrawable(getDrawable(R.drawable.connection_problem_placeholder))
                 placeholderMessageButton.visibility = View.VISIBLE
