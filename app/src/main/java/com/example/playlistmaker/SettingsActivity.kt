@@ -26,9 +26,10 @@ class SettingsActivity : AppCompatActivity() {
             finish()
         }
 
-        themeSwitcher.isChecked = (application as App).darkTheme
+        updateThemeSwitcher(themeSwitcher)
+
         themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
-            (applicationContext as App).switchTheme(checked)
+            (applicationContext as? App)?.switchTheme(checked)
         }
 
         shareButton.setOnClickListener {
@@ -42,6 +43,10 @@ class SettingsActivity : AppCompatActivity() {
         agreementButton.setOnClickListener {
             showUserAgreement()
         }
+    }
+
+    private fun updateThemeSwitcher(themeSwitcher: SwitchMaterial) {
+        themeSwitcher.isChecked = (application as? App)?.darkTheme ?: false
     }
 
     private fun shareApp() {

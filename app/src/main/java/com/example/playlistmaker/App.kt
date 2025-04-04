@@ -16,8 +16,7 @@ class App : Application() {
     }
 
     fun switchTheme(darkThemeEnabled: Boolean) {
-        preferencesManager.isDarkTheme = darkThemeEnabled
-
+        darkTheme = darkThemeEnabled
         AppCompatDelegate.setDefaultNightMode(
             if (darkThemeEnabled) {
                 AppCompatDelegate.MODE_NIGHT_YES
@@ -25,5 +24,6 @@ class App : Application() {
                 AppCompatDelegate.MODE_NIGHT_NO
             }
         )
+        preferencesManager.isDarkTheme = darkThemeEnabled
     }
 }

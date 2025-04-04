@@ -185,6 +185,7 @@ class SearchActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
         outState.putString(VALUE_EDIT_TEXT, valueEditText)
         outState.putSerializable(TRACKS, tracks)
+        outState.putSerializable(TRACKS_HISTORY, tracksHistory)
         outState.putString(CURRENT_REQUEST_STATUS, currentRequestStatus.name)
     }
 
@@ -194,16 +195,18 @@ class SearchActivity : AppCompatActivity() {
         queryInput.setText(valueEditText)
         tracks.clear()
         val savedTracks = savedInstanceState.getSerializable(TRACKS) as? ArrayList<Track>
-        if (savedTracks != null) {
-            tracks.addAll(savedTracks)
-        }
+        if (savedTracks != null) tracks.addAll(savedTracks)
         currentRequestStatus = RequestStatus.valueOf(savedInstanceState.getString(CURRENT_REQUEST_STATUS).toString())
         showMessage(currentRequestStatus)
+        tracksHistory.clear()
+        val savedTracksHistory = savedInstanceState.getSerializable(TRACKS_HISTORY) as? ArrayList<Track>
+        if (savedTracksHistory != null) tracksHistory.addAll(savedTracksHistory)
     }
 
     companion object {
         private const val VALUE_EDIT_TEXT = "value_edit_text"
         private const val TRACKS = "tracks"
+        private const val TRACKS_HISTORY = "tracks_history"
         private const val CURRENT_REQUEST_STATUS = "current_request_status"
     }
 
