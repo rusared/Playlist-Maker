@@ -13,9 +13,9 @@ class SearchHistory() {
         preferencesManager.searchHistoryList = json
     }
 
-    fun getHistory(): MutableList<Track> {
+    fun getHistory(): ArrayList<Track> {
         val json = preferencesManager.searchHistoryList
-        return Gson().fromJson(json, listType) ?: mutableListOf()
+        return Gson().fromJson(json, listType) ?: arrayListOf()
     }
 
     fun addToHistory(track: Track) {

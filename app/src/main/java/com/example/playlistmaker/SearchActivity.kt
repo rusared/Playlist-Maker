@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,6 +14,8 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isEmpty
+import androidx.core.view.isNotEmpty
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
@@ -38,10 +41,18 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchHistory: SearchHistory
     private lateinit var tracksAdapter: TracksAdapter
     private lateinit var tracksHistoryAdapter: TracksAdapter
+    private lateinit var preferencesManager: PreferencesManager
+    private val sharedPreferencesChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == PreferencesManager.SEARCH_HISTORY_LIST_KEY) {
+            tracksHistory.clear()
+            if (tracksHistory.addAll(searchHistory.getHistory()))
+            tracksHistoryAdapter.notifyDataSetChanged()
+        }
+    }
 
     private var valueEditText: String? = null
     private val tracks = ArrayList<Track>()
-    private val tracksHistory = ArrayList<Track>()
+    private var tracksHistory = ArrayList<Track>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +61,11 @@ class SearchActivity : AppCompatActivity() {
         searchHistory = SearchHistory().apply {
             preferencesManager = PreferencesManager(this@SearchActivity)
         }
+
+        preferencesManager = PreferencesManager(this)
+        preferencesManager.sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferencesChangeListener)
+
+        tracksHistory = searchHistory.getHistory()
         tracksAdapter = TracksAdapter(tracks, searchHistory)
         tracksHistoryAdapter = TracksAdapter(tracksHistory, searchHistory)
 
@@ -78,6 +94,14 @@ class SearchActivity : AppCompatActivity() {
         placeholderMessageButton.setOnClickListener {
             responseHandler()
         }
+
+        clearHistoryButton.setOnClickListener {
+            searchHistory.clearHistory()
+            tracksHistoryAdapter.notifyDataSetChanged()
+            historyView.visibility = View.GONE
+        }
+
+
 
         backButton.setNavigationOnClickListener {
             finish()
@@ -117,7 +141,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         queryInput.setOnFocusChangeListener { view, hasFocus ->
-            historyView.visibility = if (hasFocus && queryInput.text.isEmpty()) View.VISIBLE else View.GONE
+            historyView.visibility = if (hasFocus && queryInput.text.isEmpty() && tracksHistory.isNotEmpty()) View.VISIBLE else View.GONE
         }
     }
 
@@ -150,7 +174,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun historyViewVisibility(s: CharSequence?): Int {
-        return if (queryInput.hasFocus() && s?.isEmpty() == true) View.VISIBLE else View.GONE
+        return if (queryInput.hasFocus() && tracksHistory.isNotEmpty() && s?.isEmpty() == true) View.VISIBLE else View.GONE
     }
 
     private fun clearButtonVisibility(s: CharSequence?): Int {
