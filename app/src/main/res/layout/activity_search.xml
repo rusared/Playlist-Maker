@@ -120,21 +120,26 @@
                 android:text="@string/track_history_title"
                 style="@style/SearchHistoryTitleStyle" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_track_history_list"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"/>
+                android:layout_height="wrap_content" >
 
-            <Button
-                android:id="@+id/b_track_history_clear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="24dp"
-                android:text="@string/clear_history"
-                style="@style/OrdinaryButtonStyle" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_track_history_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="68dp"/>
+
+                <Button
+                    android:id="@+id/b_track_history_clear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_gravity="center|bottom"
+                    android:text="@string/clear_history"
+                    style="@style/OrdinaryButtonStyle" />
+            </FrameLayout>
         </LinearLayout>
-
     </FrameLayout>
 </LinearLayout>
