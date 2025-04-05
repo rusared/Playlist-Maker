@@ -11,6 +11,15 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         preferencesManager = PreferencesManager(this)
+
+        if (!preferencesManager.isThemeSet) {
+            val isSystemDarkTheme = (resources.configuration.uiMode and
+                    android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+                    android.content.res.Configuration.UI_MODE_NIGHT_YES
+            preferencesManager.isDarkTheme = isSystemDarkTheme
+            preferencesManager.isThemeSet = true
+        }
+
         darkTheme = preferencesManager.isDarkTheme
         switchTheme(darkTheme)
     }

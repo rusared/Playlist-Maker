@@ -8,9 +8,18 @@ class PreferencesManager(context: Context) {
 
     companion object {
         const val PLAYLIST_MAKER_PREFERENCES = "playlist_maker_preferences"
+        const val IS_THEME_SET_KEY = "is_theme_set_key"
         const val IS_DARK_THEME_KEY = "is_dark_theme_key"
         const val SEARCH_HISTORY_LIST_KEY = "search_history_list_key"
     }
+
+    var isThemeSet: Boolean
+        get() = sharedPreferences.getBoolean(IS_THEME_SET_KEY, false)
+        set(value) {
+            sharedPreferences.edit()
+                .putBoolean(IS_THEME_SET_KEY, value)
+                .apply()
+        }
 
     var isDarkTheme: Boolean
         get() = sharedPreferences.getBoolean(IS_DARK_THEME_KEY, false)
