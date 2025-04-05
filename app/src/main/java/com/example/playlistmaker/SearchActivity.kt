@@ -14,8 +14,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isEmpty
-import androidx.core.view.isNotEmpty
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
@@ -37,7 +35,6 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var currentRequestStatus: RequestStatus
     private lateinit var historyView: LinearLayout
     private lateinit var clearHistoryButton: Button
-
     private lateinit var searchHistory: SearchHistory
     private lateinit var tracksAdapter: TracksAdapter
     private lateinit var tracksHistoryAdapter: TracksAdapter
@@ -49,7 +46,6 @@ class SearchActivity : AppCompatActivity() {
             tracksHistoryAdapter.notifyDataSetChanged()
         }
     }
-
     private var valueEditText: String? = null
     private val tracks = ArrayList<Track>()
     private var tracksHistory = ArrayList<Track>()
@@ -58,12 +54,12 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
+        preferencesManager = PreferencesManager(this)
         searchHistory = SearchHistory().apply {
-            preferencesManager = PreferencesManager(this@SearchActivity)
+            this.preferencesManager = this@SearchActivity.preferencesManager
         }
         currentRequestStatus = RequestStatus.SUCCESS
 
-        preferencesManager = PreferencesManager(this)
         preferencesManager.sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferencesChangeListener)
 
         tracksHistory = searchHistory.getHistory()
@@ -102,8 +98,6 @@ class SearchActivity : AppCompatActivity() {
             historyView.visibility = View.GONE
         }
 
-
-
         backButton.setNavigationOnClickListener {
             finish()
         }
@@ -140,10 +134,15 @@ class SearchActivity : AppCompatActivity() {
             }
             false
         }
-
         queryInput.setOnFocusChangeListener { view, hasFocus ->
             historyView.visibility = if (hasFocus && queryInput.text.isEmpty() && tracksHistory.isNotEmpty()) View.VISIBLE else View.GONE
         }
+        queryInput.requestFocus()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        preferencesManager.sharedPreferences.unregisterOnSharedPreferenceChangeListener(sharedPreferencesChangeListener)
     }
 
     private fun responseHandler() {
@@ -175,7 +174,14 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun historyViewVisibility(s: CharSequence?): Int {
-        return if (queryInput.hasFocus() && tracksHistory.isNotEmpty() && s?.isEmpty() == true) View.VISIBLE else View.GONE
+        if (queryInput.hasFocus() && tracksHistory.isNotEmpty() && s?.isEmpty() == true) {
+            tracks.clear()
+            tracksAdapter.notifyDataSetChanged()
+            placeholderMessage.visibility = View.GONE
+            return View.VISIBLE
+        } else {
+            return View.GONE
+        }
     }
 
     private fun clearButtonVisibility(s: CharSequence?): Int {
@@ -188,6 +194,8 @@ class SearchActivity : AppCompatActivity() {
         outState.putSerializable(TRACKS, tracks)
         outState.putSerializable(TRACKS_HISTORY, tracksHistory)
         outState.putString(CURRENT_REQUEST_STATUS, currentRequestStatus.name)
+        outState.putInt(PLACEHOLDER_VISIBILITY, placeholderMessage.visibility)
+        outState.putInt(HISTORY_VIEW_VISIBILITY, historyView.visibility)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -207,7 +215,14 @@ class SearchActivity : AppCompatActivity() {
         currentRequestStatus = RequestStatus.valueOf(
             savedInstanceState.getString(CURRENT_REQUEST_STATUS, RequestStatus.SUCCESS.name)
         )
+
+        tracksAdapter.notifyDataSetChanged()
+        tracksHistoryAdapter.notifyDataSetChanged()
+
         showMessage(currentRequestStatus)
+        placeholderMessage.visibility = savedInstanceState.getInt(PLACEHOLDER_VISIBILITY)
+        historyView.visibility = savedInstanceState.getInt(HISTORY_VIEW_VISIBILITY)
+
     }
 
     companion object {
@@ -215,6 +230,8 @@ class SearchActivity : AppCompatActivity() {
         private const val TRACKS = "tracks"
         private const val TRACKS_HISTORY = "tracks_history"
         private const val CURRENT_REQUEST_STATUS = "current_request_status"
+        private const val PLACEHOLDER_VISIBILITY = "placeholder_visibility"
+        private const val HISTORY_VIEW_VISIBILITY = "history_view_visibility"
     }
 
     enum class RequestStatus {
