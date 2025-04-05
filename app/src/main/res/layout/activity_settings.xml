@@ -2,7 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/settings"
+    android:id="@+id/ll_settings"
     android:theme="@style/Theme.PlaylistMaker"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,7 +11,7 @@
     android:fitsSystemWindows="true" >
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/settings_back_button"
+        android:id="@+id/mt_back_button"
         app:title="@string/settings_title"
         app:navigationIcon="@drawable/arrow_back_icon"
         style="@style/TitleStyle"
@@ -21,7 +21,7 @@
     </com.google.android.material.appbar.MaterialToolbar>
 
     <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/settings_dark_switcher"
+        android:id="@+id/sm_theme_switcher"
         android:text="@string/settings_dark_switcher_text"
         android:layout_marginTop="@dimen/view_large_margin"
         app:thumbTint="@color/switch_thumb_color"
@@ -29,19 +29,19 @@
         style="@style/SettingsButtonStyle" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/settings_share_button"
+        android:id="@+id/mtv_share_button"
         android:text="@string/settings_share_button_text"
         app:drawableEndCompat="@drawable/share_icon"
         style="@style/SettingsButtonStyle" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/settings_support_button"
+        android:id="@+id/mtv_support_button"
         android:text="@string/settings_support_button_text"
         android:drawableEnd="@drawable/support_icon"
         style="@style/SettingsButtonStyle" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/settings_agreement_button"
+        android:id="@+id/mtv_agreement_button"
         android:text="@string/settings_agreement_button_text"
         android:drawableEnd="@drawable/arrow_forward_icon"
         style="@style/SettingsButtonStyle" />

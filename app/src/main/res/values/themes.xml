@@ -16,5 +16,8 @@
         <item name="search_placeholder_button_tint_color">@color/black_1A</item>
         <item name="search_placeholder_button_text_color">@color/white</item>
 
+
+        <item name="search_history_title_color">@color/black_1A</item>
+
     </style>
 </resources>
