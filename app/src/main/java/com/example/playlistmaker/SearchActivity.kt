@@ -61,6 +61,7 @@ class SearchActivity : AppCompatActivity() {
         searchHistory = SearchHistory().apply {
             preferencesManager = PreferencesManager(this@SearchActivity)
         }
+        currentRequestStatus = RequestStatus.SUCCESS
 
         preferencesManager = PreferencesManager(this)
         preferencesManager.sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferencesChangeListener)
@@ -191,16 +192,22 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
+
         valueEditText = savedInstanceState.getString(VALUE_EDIT_TEXT)
-        queryInput.setText(valueEditText)
+        queryInput.setText(valueEditText ?: "")
+
+        val savedTracks = savedInstanceState.getSerializable(TRACKS) as? ArrayList<Track> ?: ArrayList()
         tracks.clear()
-        val savedTracks = savedInstanceState.getSerializable(TRACKS) as? ArrayList<Track>
-        if (savedTracks != null) tracks.addAll(savedTracks)
-        currentRequestStatus = RequestStatus.valueOf(savedInstanceState.getString(CURRENT_REQUEST_STATUS).toString())
-        showMessage(currentRequestStatus)
+        tracks.addAll(savedTracks)
+
+        val savedTracksHistory = savedInstanceState.getSerializable(TRACKS_HISTORY) as? ArrayList<Track> ?: ArrayList()
         tracksHistory.clear()
-        val savedTracksHistory = savedInstanceState.getSerializable(TRACKS_HISTORY) as? ArrayList<Track>
-        if (savedTracksHistory != null) tracksHistory.addAll(savedTracksHistory)
+        tracksHistory.addAll(savedTracksHistory)
+
+        currentRequestStatus = RequestStatus.valueOf(
+            savedInstanceState.getString(CURRENT_REQUEST_STATUS, RequestStatus.SUCCESS.name)
+        )
+        showMessage(currentRequestStatus)
     }
 
     companion object {
