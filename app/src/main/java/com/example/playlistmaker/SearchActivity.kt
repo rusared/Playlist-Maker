@@ -1,9 +1,8 @@
 package com.example.playlistmaker
 
 import android.content.Context
-import android.graphics.drawable.Drawable
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -21,19 +20,8 @@ import com.google.android.material.appbar.MaterialToolbar
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : AppCompatActivity() {
-
-    private val iTunesBaseUrl = "https://itunes.apple.com"
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(iTunesBaseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val iTunesService = retrofit.create(ITunesSearchAPI::class.java)
 
     private lateinit var backButton: MaterialToolbar
     private lateinit var queryInput: EditText
@@ -43,15 +31,40 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var placeholderMessageText: TextView
     private lateinit var placeholderMessageButton: Button
     private lateinit var tracksList: RecyclerView
+    private lateinit var tracksHistoryList: RecyclerView
     private lateinit var currentRequestStatus: RequestStatus
-
+    private lateinit var historyView: LinearLayout
+    private lateinit var clearHistoryButton: Button
+    private lateinit var searchHistory: SearchHistory
+    private lateinit var tracksAdapter: TracksAdapter
+    private lateinit var tracksHistoryAdapter: TracksAdapter
+    private lateinit var preferencesManager: PreferencesManager
+    private val sharedPreferencesChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == PreferencesManager.SEARCH_HISTORY_LIST_KEY) {
+            tracksHistory.clear()
+            if (tracksHistory.addAll(searchHistory.getHistory()))
+            tracksHistoryAdapter.notifyDataSetChanged()
+        }
+    }
     private var valueEditText: String? = null
     private val tracks = ArrayList<Track>()
-    private val adapter = TracksAdapter(tracks)
+    private var tracksHistory = ArrayList<Track>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        preferencesManager = PreferencesManager(this)
+        searchHistory = SearchHistory().apply {
+            this.preferencesManager = this@SearchActivity.preferencesManager
+        }
+        currentRequestStatus = RequestStatus.SUCCESS
+
+        preferencesManager.sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferencesChangeListener)
+
+        tracksHistory = searchHistory.getHistory()
+        tracksAdapter = TracksAdapter(tracks, searchHistory)
+        tracksHistoryAdapter = TracksAdapter(tracksHistory, searchHistory)
 
         backButton = findViewById(R.id.mt_search_back_button)
         setSupportActionBar(backButton)
@@ -62,11 +75,14 @@ class SearchActivity : AppCompatActivity() {
         placeholderMessageText = findViewById(R.id.tv_placeholder_message)
         placeholderMessageButton = findViewById(R.id.b_placeholder_message)
         tracksList = findViewById(R.id.rv_tracks_list)
+        tracksHistoryList = findViewById(R.id.rv_track_history_list)
+        historyView = findViewById(R.id.ll_track_history)
+        clearHistoryButton = findViewById(R.id.b_track_history_clear)
 
         clearButton.setOnClickListener {
             queryInput.setText("")
             tracks.clear()
-            adapter.notifyDataSetChanged()
+            tracksAdapter.notifyDataSetChanged()
             placeholderMessage.visibility = View.GONE
             val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(queryInput.windowToken, 0)
@@ -74,6 +90,12 @@ class SearchActivity : AppCompatActivity() {
 
         placeholderMessageButton.setOnClickListener {
             responseHandler()
+        }
+
+        clearHistoryButton.setOnClickListener {
+            searchHistory.clearHistory()
+            tracksHistoryAdapter.notifyDataSetChanged()
+            historyView.visibility = View.GONE
         }
 
         backButton.setNavigationOnClickListener {
@@ -88,6 +110,7 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearButton.visibility = clearButtonVisibility(s)
                 valueEditText = s?.toString()
+                historyView.visibility = historyViewVisibility(s)
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -98,7 +121,9 @@ class SearchActivity : AppCompatActivity() {
         queryInput.addTextChangedListener(simpleTextWatcher)
 
         tracksList.layoutManager = LinearLayoutManager(this)
-        tracksList.adapter = adapter
+        tracksHistoryList.layoutManager = LinearLayoutManager(this)
+        tracksList.adapter = tracksAdapter
+        tracksHistoryList.adapter = tracksHistoryAdapter
 
         queryInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -109,17 +134,25 @@ class SearchActivity : AppCompatActivity() {
             }
             false
         }
+        queryInput.setOnFocusChangeListener { view, hasFocus ->
+            historyView.visibility = if (hasFocus && queryInput.text.isEmpty() && tracksHistory.isNotEmpty()) View.VISIBLE else View.GONE
+        }
+        queryInput.requestFocus()
+    }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        preferencesManager.sharedPreferences.unregisterOnSharedPreferenceChangeListener(sharedPreferencesChangeListener)
     }
 
     private fun responseHandler() {
-        iTunesService.search(queryInput.text.toString()).enqueue(object : Callback<TracksResponse> {
+        RetrofitClient.iTunesService.search(queryInput.text.toString()).enqueue(object : Callback<TracksResponse> {
             override fun onResponse(call: Call<TracksResponse>, response: Response<TracksResponse>) {
                 if (response.code() == 200) {
                     tracks.clear()
                     if (response.body()?.results?.isNotEmpty() == true) {
                         tracks.addAll(response.body()?.results!!)
-                        adapter.notifyDataSetChanged()
+                        tracksAdapter.notifyDataSetChanged()
                     }
                     if (tracks.isEmpty()) {
                         currentRequestStatus = RequestStatus.NOTHING_FOUND
@@ -140,6 +173,17 @@ class SearchActivity : AppCompatActivity() {
         })
     }
 
+    private fun historyViewVisibility(s: CharSequence?): Int {
+        if (queryInput.hasFocus() && tracksHistory.isNotEmpty() && s?.isEmpty() == true) {
+            tracks.clear()
+            tracksAdapter.notifyDataSetChanged()
+            placeholderMessage.visibility = View.GONE
+            return View.VISIBLE
+        } else {
+            return View.GONE
+        }
+    }
+
     private fun clearButtonVisibility(s: CharSequence?): Int {
         return if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
     }
@@ -148,26 +192,46 @@ class SearchActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
         outState.putString(VALUE_EDIT_TEXT, valueEditText)
         outState.putSerializable(TRACKS, tracks)
+        outState.putSerializable(TRACKS_HISTORY, tracksHistory)
         outState.putString(CURRENT_REQUEST_STATUS, currentRequestStatus.name)
+        outState.putInt(PLACEHOLDER_VISIBILITY, placeholderMessage.visibility)
+        outState.putInt(HISTORY_VIEW_VISIBILITY, historyView.visibility)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
+
         valueEditText = savedInstanceState.getString(VALUE_EDIT_TEXT)
-        queryInput.setText(valueEditText)
+        queryInput.setText(valueEditText ?: "")
+
+        val savedTracks = savedInstanceState.getSerializable(TRACKS) as? ArrayList<Track> ?: ArrayList()
         tracks.clear()
-        val savedTracks = savedInstanceState.getSerializable(TRACKS) as? ArrayList<Track>
-        if (savedTracks != null) {
-            tracks.addAll(savedTracks)
-        }
-        currentRequestStatus = RequestStatus.valueOf(savedInstanceState.getString(CURRENT_REQUEST_STATUS).toString())
+        tracks.addAll(savedTracks)
+
+        val savedTracksHistory = savedInstanceState.getSerializable(TRACKS_HISTORY) as? ArrayList<Track> ?: ArrayList()
+        tracksHistory.clear()
+        tracksHistory.addAll(savedTracksHistory)
+
+        currentRequestStatus = RequestStatus.valueOf(
+            savedInstanceState.getString(CURRENT_REQUEST_STATUS, RequestStatus.SUCCESS.name)
+        )
+
+        tracksAdapter.notifyDataSetChanged()
+        tracksHistoryAdapter.notifyDataSetChanged()
+
         showMessage(currentRequestStatus)
+        placeholderMessage.visibility = savedInstanceState.getInt(PLACEHOLDER_VISIBILITY)
+        historyView.visibility = savedInstanceState.getInt(HISTORY_VIEW_VISIBILITY)
+
     }
 
     companion object {
         private const val VALUE_EDIT_TEXT = "value_edit_text"
         private const val TRACKS = "tracks"
+        private const val TRACKS_HISTORY = "tracks_history"
         private const val CURRENT_REQUEST_STATUS = "current_request_status"
+        private const val PLACEHOLDER_VISIBILITY = "placeholder_visibility"
+        private const val HISTORY_VIEW_VISIBILITY = "history_view_visibility"
     }
 
     enum class RequestStatus {
@@ -186,7 +250,7 @@ class SearchActivity : AppCompatActivity() {
             RequestStatus.NOTHING_FOUND -> {
                 placeholderMessage.visibility = View.VISIBLE
                 tracks.clear()
-                adapter.notifyDataSetChanged()
+                tracksAdapter.notifyDataSetChanged()
                 placeholderMessageText.text = getString(R.string.nothing_found)
                 placeholderMessageImage.setImageDrawable(getDrawable(R.drawable.nothing_found_placeholder))
                 placeholderMessageButton.visibility = View.GONE
@@ -195,7 +259,7 @@ class SearchActivity : AppCompatActivity() {
             RequestStatus.CONNECTION_PROBLEM -> {
                 placeholderMessage.visibility = View.VISIBLE
                 tracks.clear()
-                adapter.notifyDataSetChanged()
+                tracksAdapter.notifyDataSetChanged()
                 placeholderMessageText.text = getString(R.string.connection_problem)
                 placeholderMessageImage.setImageDrawable(getDrawable(R.drawable.connection_problem_placeholder))
                 placeholderMessageButton.visibility = View.VISIBLE
