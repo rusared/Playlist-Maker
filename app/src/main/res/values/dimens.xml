@@ -3,6 +3,7 @@
 
     <dimen name="view_large_margin">24dp</dimen>
     <dimen name="view_regular_margin">16dp</dimen>
+    <dimen name="view_small_margin">8dp</dimen>
     <dimen name="main_button_cornerRadius">16dp</dimen>
     <dimen name="settings_button_dimen">60dp</dimen>
     <dimen name="settings_button_paddingVertical">20dp</dimen>
