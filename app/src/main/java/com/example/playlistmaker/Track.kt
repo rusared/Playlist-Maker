@@ -8,5 +8,11 @@ data class Track(
     val artistName: String, // Имя исполнителя
     @SerializedName("trackTimeMillis") val trackTime: String, // Продолжительность трека
     val artworkUrl100: String, // Ссылка на изображение обложки
-    val trackId: String  // Идентификатор треков
-) : Serializable
+    val trackId: String, // Идентификатор треков
+    val collectionName: String, // Название альбома
+    val releaseDate: String, // Год релиза трека
+    val primaryGenreName: String, // Жанр трека
+    val country: String // Страна исполнителя
+) : Serializable {
+    fun getCoverArtwork() = artworkUrl100.replaceAfterLast('/',"512x512bb.jpg")
+}

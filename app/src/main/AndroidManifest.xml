@@ -19,6 +19,10 @@
         tools:targetApi="35">
 
         <activity
+            android:name=".AudioPlayerActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+        <activity
             android:name=".LibraryActivity"
             android:exported="false" />
         <activity
