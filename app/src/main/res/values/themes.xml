@@ -18,6 +18,7 @@
 
 
         <item name="search_history_title_color">@color/black_1A</item>
+        <item name="audio_player_text_color">@color/black_1A</item>
 
     </style>
 </resources>
