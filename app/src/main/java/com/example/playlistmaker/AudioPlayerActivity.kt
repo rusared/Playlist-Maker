@@ -1,6 +1,8 @@
 package com.example.playlistmaker
 
 import android.os.Bundle
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
@@ -15,12 +17,29 @@ import java.time.format.DateTimeFormatter
 class AudioPlayerActivity : AppCompatActivity() {
 
     private lateinit var backButton: ImageButton
+    private lateinit var trackNameValue: TextView
+    private lateinit var artistNameValue: TextView
+    private lateinit var durationValue: TextView
+    private lateinit var album: TextView
+    private lateinit var albumValue: TextView
+    private lateinit var yearValue: TextView
+    private lateinit var genreValue: TextView
+    private lateinit var countryValue: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audio_player)
 
         backButton = findViewById(R.id.ib_back_button)
+        trackNameValue = findViewById(R.id.tv_track_name)
+        artistNameValue = findViewById(R.id.tv_artist_name)
+        durationValue = findViewById(R.id.tv_duration_value)
+        album = findViewById(R.id.tv_album)
+        albumValue = findViewById(R.id.tv_album_value)
+        yearValue = findViewById(R.id.tv_year_value)
+        genreValue = findViewById(R.id.tv_genre_value)
+        countryValue = findViewById(R.id.tv_country_value)
+
         backButton.setOnClickListener {
             finish()
         }
@@ -32,13 +51,22 @@ class AudioPlayerActivity : AppCompatActivity() {
             return
         }
 
-        findViewById<TextView>(R.id.tv_track_name).text = track.trackName
-        findViewById<TextView>(R.id.tv_artist_name).text = track.artistName
-        findViewById<TextView>(R.id.tv_duration_value).text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTime.toLong())
-        findViewById<TextView>(R.id.tv_album_value).text = track.collectionName
-        findViewById<TextView>(R.id.tv_year_value).text = LocalDate.parse(track.releaseDate, DateTimeFormatter.ISO_DATE_TIME).year.toString()
-        findViewById<TextView>(R.id.tv_genre_value).text = track.primaryGenreName
-        findViewById<TextView>(R.id.tv_country_value).text = track.country
+        trackNameValue.text = track.trackName
+        artistNameValue.text = track.artistName
+        durationValue.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTime.toLong())
+
+        if (track.collectionName.isNullOrEmpty()) {
+            album.visibility = GONE
+            albumValue.visibility = GONE
+        } else {
+            albumValue.text = track.collectionName
+            album.visibility = VISIBLE
+            albumValue.visibility = VISIBLE
+        }
+
+        yearValue.text = LocalDate.parse(track.releaseDate, DateTimeFormatter.ISO_DATE_TIME).year.toString()
+        genreValue.text = track.primaryGenreName
+        countryValue.text = track.country
 
         Glide.with(this)
             .load(track.getCoverArtwork())
