@@ -2,6 +2,8 @@ package com.example.playlistmaker
 
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.ImageButton
@@ -22,6 +24,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         private const val STATE_PREPARED = 1
         private const val STATE_PLAYING = 2
         private const val STATE_PAUSED = 3
+        private const val DELAY = 300L
     }
 
     private lateinit var backButton: ImageButton
@@ -35,8 +38,10 @@ class AudioPlayerActivity : AppCompatActivity() {
     private lateinit var countryValue: TextView
     private lateinit var playButton: ImageButton
     private lateinit var currentTrack: Track
+    private lateinit var playbackProgress: TextView
     private var playerState = STATE_DEFAULT
     private var mediaPlayer = MediaPlayer()
+    private var playbackProgressHandler: Handler? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +57,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         genreValue = findViewById(R.id.tv_genre_value)
         countryValue = findViewById(R.id.tv_country_value)
         playButton = findViewById(R.id.ib_play_button)
-
+        playbackProgress = findViewById(R.id.tv_playback_progress)
 
         backButton.setOnClickListener {
             finish()
@@ -81,6 +86,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         yearValue.text = LocalDate.parse(currentTrack.releaseDate, DateTimeFormatter.ISO_DATE_TIME).year.toString()
         genreValue.text = currentTrack.primaryGenreName
         countryValue.text = currentTrack.country
+        playbackProgress.text = "00:00"
 
         Glide.with(this)
             .load(currentTrack.getCoverArtwork())
@@ -92,6 +98,8 @@ class AudioPlayerActivity : AppCompatActivity() {
         playButton.setOnClickListener {
             playbackControl()
         }
+
+        playbackProgressHandler = Handler(Looper.getMainLooper())
     }
 
     override fun onPause() {
@@ -102,6 +110,7 @@ class AudioPlayerActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         mediaPlayer.release()
+        playbackProgressHandler?.removeCallbacksAndMessages(null)
     }
 
     private fun playbackControl() {
@@ -122,6 +131,8 @@ class AudioPlayerActivity : AppCompatActivity() {
         mediaPlayer.setOnCompletionListener {
             playButton.setImageDrawable(getDrawable(R.drawable.play_button))
             playerState = STATE_PREPARED
+            playbackProgress.text = "00:00"
+            playbackProgressHandler?.removeCallbacksAndMessages(null)
         }
     }
 
@@ -129,12 +140,29 @@ class AudioPlayerActivity : AppCompatActivity() {
         mediaPlayer.start()
         playButton.setImageDrawable(getDrawable(R.drawable.pause_button))
         playerState = STATE_PLAYING
+        startPlaybackProgress()
     }
 
     private fun pausePlayer() {
         mediaPlayer.pause()
         playButton.setImageDrawable(getDrawable(R.drawable.play_button))
         playerState = STATE_PAUSED
+        playbackProgressHandler?.removeCallbacksAndMessages(null)
+    }
+
+    private fun startPlaybackProgress() {
+        playbackProgressHandler?.post(
+            createUpdateProgressTask()
+        )
+    }
+
+    private fun createUpdateProgressTask(): Runnable {
+        return object : Runnable {
+            override fun run() {
+                playbackProgress.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
+                playbackProgressHandler?.postDelayed(this, DELAY)
+            }
+        }
     }
 
 }
