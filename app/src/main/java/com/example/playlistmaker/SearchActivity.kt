@@ -3,6 +3,8 @@ package com.example.playlistmaker
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -111,6 +113,7 @@ class SearchActivity : AppCompatActivity() {
                 clearButton.visibility = clearButtonVisibility(s)
                 valueEditText = s?.toString()
                 historyView.visibility = historyViewVisibility(s)
+                if (s.isNullOrEmpty()==false) searchDebounce()
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -232,6 +235,17 @@ class SearchActivity : AppCompatActivity() {
         private const val CURRENT_REQUEST_STATUS = "current_request_status"
         private const val PLACEHOLDER_VISIBILITY = "placeholder_visibility"
         private const val HISTORY_VIEW_VISIBILITY = "history_view_visibility"
+
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+    }
+
+    private val handler = Handler(Looper.getMainLooper())
+
+    private val searchRunnable = Runnable { responseHandler() }
+
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
 
     enum class RequestStatus {
