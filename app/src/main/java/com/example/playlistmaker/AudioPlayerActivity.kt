@@ -19,14 +19,6 @@ import java.time.format.DateTimeFormatter
 
 class AudioPlayerActivity : AppCompatActivity() {
 
-    companion object {
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
-        private const val DELAY = 300L
-    }
-
     private lateinit var backButton: ImageButton
     private lateinit var trackNameValue: TextView
     private lateinit var artistNameValue: TextView
@@ -41,7 +33,7 @@ class AudioPlayerActivity : AppCompatActivity() {
     private lateinit var playbackProgress: TextView
     private var playerState = STATE_DEFAULT
     private var mediaPlayer = MediaPlayer()
-    private var playbackProgressHandler: Handler? = null
+    private var playbackProgressHandler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +55,7 @@ class AudioPlayerActivity : AppCompatActivity() {
             finish()
         }
 
-        currentTrack = (intent.getSerializableExtra("TRACK") as? Track)!!
+        currentTrack = (intent.getSerializableExtra(TracksAdapter.TRACK) as? Track)!!
         if (currentTrack == null) {
             Toast.makeText(this, "Трек не найден", Toast.LENGTH_SHORT).show()
             finish()
@@ -86,20 +78,22 @@ class AudioPlayerActivity : AppCompatActivity() {
         yearValue.text = LocalDate.parse(currentTrack.releaseDate, DateTimeFormatter.ISO_DATE_TIME).year.toString()
         genreValue.text = currentTrack.primaryGenreName
         countryValue.text = currentTrack.country
-        playbackProgress.text = "00:00"
+        playbackProgress.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(0)
+
+        val radiusInDp = 8
+        val density = resources.displayMetrics.density
+        val radiusInPx = (radiusInDp * density).toInt()
 
         Glide.with(this)
             .load(currentTrack.getCoverArtwork())
             .placeholder(R.drawable.album_placeholder)
-            .transform(RoundedCorners(8))
+            .transform(RoundedCorners(radiusInPx))
             .into(findViewById(R.id.iv_artwork))
 
         preparePlayer()
         playButton.setOnClickListener {
             playbackControl()
         }
-
-        playbackProgressHandler = Handler(Looper.getMainLooper())
     }
 
     override fun onPause() {
@@ -131,7 +125,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         mediaPlayer.setOnCompletionListener {
             playButton.setImageDrawable(getDrawable(R.drawable.play_button))
             playerState = STATE_PREPARED
-            playbackProgress.text = "00:00"
+            playbackProgress.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(0)
             playbackProgressHandler?.removeCallbacksAndMessages(null)
         }
     }
@@ -165,4 +159,11 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
     }
 
+    companion object {
+        private const val STATE_DEFAULT = 0
+        private const val STATE_PREPARED = 1
+        private const val STATE_PLAYING = 2
+        private const val STATE_PAUSED = 3
+        private const val DELAY = 300L
+    }
 }

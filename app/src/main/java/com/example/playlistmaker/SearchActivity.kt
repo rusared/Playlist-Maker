@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
@@ -19,6 +20,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.TracksAdapter.Companion.TRACK
 import com.google.android.material.appbar.MaterialToolbar
 import retrofit2.Call
 import retrofit2.Callback
@@ -67,8 +69,15 @@ class SearchActivity : AppCompatActivity() {
         preferencesManager.sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferencesChangeListener)
 
         tracksHistory = searchHistory.getHistory()
-        tracksAdapter = TracksAdapter(tracks, searchHistory)
-        tracksHistoryAdapter = TracksAdapter(tracksHistory, searchHistory)
+
+        val trackClickListener: (Track) -> Unit = { track ->
+            val intent = Intent(this, AudioPlayerActivity::class.java).apply {
+                putExtra(TRACK, track)
+            }
+            startActivity(intent)
+        }
+        tracksAdapter = TracksAdapter(tracks, searchHistory, trackClickListener)
+        tracksHistoryAdapter = TracksAdapter(tracksHistory, searchHistory, trackClickListener)
 
         backButton = findViewById(R.id.mt_search_back_button)
         setSupportActionBar(backButton)
@@ -149,6 +158,7 @@ class SearchActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         preferencesManager.sharedPreferences.unregisterOnSharedPreferenceChangeListener(sharedPreferencesChangeListener)
+        handler.removeCallbacks(searchRunnable)
     }
 
     private fun responseHandler() {
