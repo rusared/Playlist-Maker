@@ -1,14 +1,14 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.tracks
 
-import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.data.SearchHistory
+import com.example.playlistmaker.domain.models.Track
 
 class TracksAdapter(
-    private val tracks: List<Track>,
-    private val searchHistory: SearchHistory,
+    private var tracks: List<Track>,
     private val clickListener: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackViewHolder> () {
 
@@ -22,13 +22,15 @@ class TracksAdapter(
 
         holder.itemView.setOnClickListener {
             if (clickDebounce()) clickListener(tracks[position])
-            Handler(Looper.getMainLooper()).postDelayed({
-                searchHistory.addToHistory(tracks[position])
-            }, ADD_HISTORY_DELAY)}
+        }
     }
 
     override fun getItemCount() = tracks.size
 
+    fun updateTracks(newTracks: List<Track>) {
+        this.tracks = newTracks
+        notifyDataSetChanged()
+    }
 
     private var isClickAllowed = true
     private val handler = Handler(Looper.getMainLooper())
@@ -44,7 +46,6 @@ class TracksAdapter(
 
     companion object {
         private const val CLICK_DEBOUNCE_DELAY = 1000L
-        private const val ADD_HISTORY_DELAY = 500L
         const val TRACK = "TRACK"
     }
 }
