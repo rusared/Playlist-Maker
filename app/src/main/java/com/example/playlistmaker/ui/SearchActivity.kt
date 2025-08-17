@@ -61,16 +61,6 @@ class SearchActivity : AppCompatActivity(), SearchInteractor.TracksConsumer {
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { responseHandler() }
 
-    companion object {
-        private const val VALUE_EDIT_TEXT = "value_edit_text"
-        private const val TRACKS = "tracks"
-        private const val TRACKS_HISTORY = "tracks_history"
-        private const val CURRENT_REQUEST_STATUS = "current_request_status"
-        private const val PLACEHOLDER_VISIBILITY = "placeholder_visibility"
-        private const val HISTORY_VIEW_VISIBILITY = "history_view_visibility"
-        private const val SEARCH_DEBOUNCE_DELAY = 2000L
-    }
-
     enum class RequestStatus {
         SUCCESS,
         NOTHING_FOUND,
@@ -122,6 +112,7 @@ class SearchActivity : AppCompatActivity(), SearchInteractor.TracksConsumer {
         clearButton.setOnClickListener {
             queryInput.setText("")
             tracks.clear()
+            tracksList.visibility = View.GONE
             tracksAdapter.notifyDataSetChanged()
             placeholderMessage.visibility = View.GONE
             val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
@@ -284,5 +275,15 @@ class SearchActivity : AppCompatActivity(), SearchInteractor.TracksConsumer {
                 placeholderMessageButton.visibility = View.VISIBLE
             }
         }
+    }
+
+    companion object {
+        private const val VALUE_EDIT_TEXT = "value_edit_text"
+        private const val TRACKS = "tracks"
+        private const val TRACKS_HISTORY = "tracks_history"
+        private const val CURRENT_REQUEST_STATUS = "current_request_status"
+        private const val PLACEHOLDER_VISIBILITY = "placeholder_visibility"
+        private const val HISTORY_VIEW_VISIBILITY = "history_view_visibility"
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 }
