@@ -1,7 +1,7 @@
 package com.example.playlistmaker.data
 
-import com.example.playlistmaker.data.dto.Response
+import retrofit2.Response
 
 interface NetworkClient {
-    fun doRequest(dto: Any): Response
+    fun doRequest(dto: Any): Response<*>
 }

@@ -12,9 +12,10 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRep
 
     override fun searchTracks(term: String): List<Track> {
         val response = networkClient.doRequest(TracksSearchRequest(term))
-        if (response.resultCode == 200) {
-            val tracksResponse = response as? TracksSearchResponse
-            return tracksResponse?.results?.map { dto ->
+
+        return if (response.isSuccessful) {
+            val tracksResponse = response.body() as? TracksSearchResponse
+            tracksResponse?.results?.map { dto ->
                 Track(
                     trackName = dto.trackName,
                     artistName = dto.artistName,
@@ -28,7 +29,8 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRep
                     previewUrl = dto.previewUrl.toString()
                 )
             } ?: emptyList()
+        } else {
+            emptyList()
         }
-        return emptyList()
     }
 }

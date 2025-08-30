@@ -1,8 +1,6 @@
 package com.example.playlistmaker.ui
 
-import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
