@@ -7,9 +7,14 @@ interface PlayerInteractor {
     fun release()
     fun getCurrentPosition(): Int
     fun isPlaying(): Boolean
+    fun playPause()
 
     interface PlayerStateListener {
-        fun onPrepared()
-        fun onCompletion()
+        fun onStateChanged(state: PlayerState)
+        fun onProgressUpdated(position: Int)
+    }
+
+    enum class PlayerState {
+        PREPARED, PLAYING, PAUSED, COMPLETED
     }
 }

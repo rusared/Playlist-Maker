@@ -19,12 +19,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.Creator
-import com.example.playlistmaker.data.PreferencesManager
 import com.example.playlistmaker.R
-import com.example.playlistmaker.domain.api.HistoryInteractor
 import com.example.playlistmaker.ui.tracks.TracksAdapter
 import com.example.playlistmaker.ui.tracks.TracksAdapter.Companion.TRACK
 import com.example.playlistmaker.domain.api.SearchInteractor
+import com.example.playlistmaker.domain.impl.SearchHistoryInteractor
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.ui.player.AudioPlayerActivity
 import com.google.android.material.appbar.MaterialToolbar
@@ -48,8 +47,7 @@ class SearchActivity : AppCompatActivity(), SearchInteractor.TracksConsumer {
     private lateinit var tracksHistoryAdapter: TracksAdapter
 
     private lateinit var searchInteractor: SearchInteractor
-    private lateinit var historyInteractor: HistoryInteractor
-    private lateinit var preferencesManager: PreferencesManager
+    private lateinit var searchHistoryInteractor: SearchHistoryInteractor
 
     private val tracks = ArrayList<Track>()
     private var tracksHistory = ArrayList<Track>()
@@ -69,9 +67,8 @@ class SearchActivity : AppCompatActivity(), SearchInteractor.TracksConsumer {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        preferencesManager = PreferencesManager(this)
         searchInteractor = Creator.provideSearchInteractor()
-        historyInteractor = Creator.provideHistoryInteractor(preferencesManager)
+        searchHistoryInteractor = Creator.provideSearchHistoryInteractor(this)
 
         backButton = findViewById(R.id.mt_search_back_button)
         queryInput = findViewById(R.id.et_query_input)
@@ -88,24 +85,19 @@ class SearchActivity : AppCompatActivity(), SearchInteractor.TracksConsumer {
 
         setSupportActionBar(backButton)
 
-        tracksHistory = ArrayList(historyInteractor.getHistory())
+        tracksHistory = ArrayList(searchHistoryInteractor.getHistory())
 
         val trackClickListener: (Track) -> Unit = { track ->
             val intent = Intent(this, AudioPlayerActivity::class.java).apply {
                 putExtra(TRACK, track)
             }
             startActivity(intent)
-            historyInteractor.addToHistory(track)
+            searchHistoryInteractor.addToHistory(track)
+            updateHistoryUI()
         }
 
         tracksAdapter = TracksAdapter(tracks, trackClickListener)
         tracksHistoryAdapter = TracksAdapter(tracksHistory, trackClickListener)
-
-        historyInteractor.registerHistoryListener {
-            tracksHistory.clear()
-            tracksHistory.addAll(historyInteractor.getHistory())
-            tracksHistoryAdapter.notifyDataSetChanged()
-        }
 
         clearButton.setOnClickListener {
             queryInput.setText("")
@@ -122,9 +114,11 @@ class SearchActivity : AppCompatActivity(), SearchInteractor.TracksConsumer {
         }
 
         clearHistoryButton.setOnClickListener {
-            historyInteractor.clearHistory()
+            searchHistoryInteractor.clearHistory()
+            tracksHistory.clear()
             tracksHistoryAdapter.notifyDataSetChanged()
             historyView.visibility = View.GONE
+            updateHistoryUI()
         }
 
         backButton.setNavigationOnClickListener {
@@ -170,11 +164,6 @@ class SearchActivity : AppCompatActivity(), SearchInteractor.TracksConsumer {
         queryInput.requestFocus()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        historyInteractor.unregisterHistoryListener()
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(VALUE_EDIT_TEXT, valueEditText)
@@ -210,6 +199,11 @@ class SearchActivity : AppCompatActivity(), SearchInteractor.TracksConsumer {
         placeholderMessage.visibility = savedInstanceState.getInt(PLACEHOLDER_VISIBILITY)
         historyView.visibility = savedInstanceState.getInt(HISTORY_VIEW_VISIBILITY)
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateHistoryUI()
     }
 
     private fun responseHandler() {
@@ -272,6 +266,17 @@ class SearchActivity : AppCompatActivity(), SearchInteractor.TracksConsumer {
                 placeholderMessageImage.setImageDrawable(getDrawable(R.drawable.connection_problem_placeholder))
                 placeholderMessageButton.visibility = View.VISIBLE
             }
+        }
+    }
+
+    private fun updateHistoryUI() {
+        tracksHistory.clear()
+        tracksHistory.addAll(searchHistoryInteractor.getHistory())
+        tracksHistoryAdapter.notifyDataSetChanged()
+        historyView.visibility = if (tracksHistory.isNotEmpty() && queryInput.text.isEmpty()) {
+            View.VISIBLE
+        } else {
+            View.GONE
         }
     }
 

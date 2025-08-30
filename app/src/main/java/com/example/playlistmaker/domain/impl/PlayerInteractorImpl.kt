@@ -5,46 +5,58 @@ import android.os.Looper
 import com.example.playlistmaker.domain.api.PlayerInteractor
 
 class PlayerInteractorImpl(
-    private val repository: PlayerInteractor,
-    private val handler: Handler = Handler(Looper.getMainLooper())
-) {
-    private var progressRunnable: Runnable? = null
-    private var listener: PlayerStateListener? = null
+    private val repository: PlayerInteractor
+) : PlayerInteractor {
 
-    fun prepare(url: String, listener: PlayerStateListener) {
-        this.listener = listener
+    private val handler = Handler(Looper.getMainLooper())
+    private var progressRunnable: Runnable? = null
+    private var stateListener: PlayerInteractor.PlayerStateListener? = null
+
+    override fun prepare(url: String, listener: PlayerInteractor.PlayerStateListener) {
+        this.stateListener = listener
         repository.prepare(url, object : PlayerInteractor.PlayerStateListener {
-            override fun onPrepared() {
-                listener.onStateChanged(PlayerState.PREPARED)
+            override fun onStateChanged(state: PlayerInteractor.PlayerState) {
+                stateListener?.onStateChanged(state)
             }
-            override fun onCompletion() {
-                stopProgressUpdates()
-                listener.onStateChanged(PlayerState.COMPLETED)
+            override fun onProgressUpdated(position: Int) {
+                stateListener?.onProgressUpdated(position)
             }
         })
     }
 
-    fun playPause() {
-        if (repository.isPlaying()) {
-            repository.pause()
-            stopProgressUpdates()
-            listener?.onStateChanged(PlayerState.PAUSED)
-        } else {
-            repository.start()
-            startProgressUpdates()
-            listener?.onStateChanged(PlayerState.PLAYING)
-        }
+    override fun start() {
+        repository.start()
+        startProgressUpdates()
+        stateListener?.onStateChanged(PlayerInteractor.PlayerState.PLAYING)
     }
 
-    fun release() {
+    override fun pause() {
+        repository.pause()
+        stopProgressUpdates()
+        stateListener?.onStateChanged(PlayerInteractor.PlayerState.PAUSED)
+    }
+
+    override fun release() {
         stopProgressUpdates()
         repository.release()
+    }
+
+    override fun getCurrentPosition(): Int = repository.getCurrentPosition()
+
+    override fun isPlaying(): Boolean = repository.isPlaying()
+
+    override fun playPause() {
+        if (isPlaying()) {
+            pause()
+        } else {
+            start()
+        }
     }
 
     private fun startProgressUpdates() {
         progressRunnable = object : Runnable {
             override fun run() {
-                listener?.onProgressUpdated(repository.getCurrentPosition())
+                stateListener?.onProgressUpdated(repository.getCurrentPosition())
                 handler.postDelayed(this, 300L)
             }
         }.also { handler.post(it) }
@@ -53,14 +65,5 @@ class PlayerInteractorImpl(
     private fun stopProgressUpdates() {
         progressRunnable?.let { handler.removeCallbacks(it) }
         progressRunnable = null
-    }
-
-    interface PlayerStateListener {
-        fun onStateChanged(state: PlayerState)
-        fun onProgressUpdated(position: Int)
-    }
-
-    enum class PlayerState {
-        PREPARED, PLAYING, PAUSED, COMPLETED
     }
 }

@@ -4,7 +4,6 @@ import android.os.Handler
 import android.os.Looper
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.data.SearchHistory
 import com.example.playlistmaker.domain.models.Track
 
 class TracksAdapter(

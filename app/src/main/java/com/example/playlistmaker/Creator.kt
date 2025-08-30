@@ -1,14 +1,16 @@
 package com.example.playlistmaker
 
+import android.content.Context
 import com.example.playlistmaker.data.PreferencesManager
-import com.example.playlistmaker.data.SearchHistory
+import com.example.playlistmaker.domain.impl.SearchHistoryInteractor
 import com.example.playlistmaker.data.impl.PlayerRepositoryImpl
+import com.example.playlistmaker.data.impl.PreferencesRepositoryImpl
 import com.example.playlistmaker.data.network.RetrofitNetworkClient
 import com.example.playlistmaker.data.impl.TracksRepositoryImpl
-import com.example.playlistmaker.domain.api.HistoryInteractor
+import com.example.playlistmaker.domain.api.PlayerInteractor
+import com.example.playlistmaker.domain.api.PreferencesRepository
 import com.example.playlistmaker.domain.api.SearchInteractor
 import com.example.playlistmaker.domain.api.TracksRepository
-import com.example.playlistmaker.domain.impl.HistoryInteractorImpl
 import com.example.playlistmaker.domain.impl.PlayerInteractorImpl
 import com.example.playlistmaker.domain.impl.SearchInteractorImpl
 
@@ -22,13 +24,17 @@ object Creator {
         return SearchInteractorImpl(getTracksRepository())
     }
 
-    fun provideHistoryInteractor(preferencesManager: PreferencesManager): HistoryInteractor {
-        return HistoryInteractorImpl(SearchHistory().apply {
-            this.preferencesManager = preferencesManager
-        }, preferencesManager)
+    fun providePlayerInteractor(): PlayerInteractor {
+        return PlayerInteractorImpl(PlayerRepositoryImpl())
     }
 
-    fun providePlayerInteractor(): PlayerInteractorImpl {
-        return PlayerInteractorImpl(PlayerRepositoryImpl())
+    fun providePreferencesRepository(context: Context): PreferencesRepository {
+        val preferencesManager = PreferencesManager(context)
+        return PreferencesRepositoryImpl(preferencesManager)
+    }
+
+    fun provideSearchHistoryInteractor(context: Context): SearchHistoryInteractor {
+        val repository = providePreferencesRepository(context)
+        return SearchHistoryInteractor(repository)
     }
 }

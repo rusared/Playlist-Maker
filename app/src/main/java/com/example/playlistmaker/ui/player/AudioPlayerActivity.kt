@@ -10,7 +10,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
-import com.example.playlistmaker.domain.impl.PlayerInteractorImpl
+import com.example.playlistmaker.domain.api.PlayerInteractor
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.ui.tracks.TracksAdapter
 import java.text.SimpleDateFormat
@@ -18,9 +18,9 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-class AudioPlayerActivity : AppCompatActivity(), PlayerInteractorImpl.PlayerStateListener {
+class AudioPlayerActivity : AppCompatActivity(), PlayerInteractor.PlayerStateListener {
 
-    private lateinit var playerInteractor: PlayerInteractorImpl
+    private lateinit var playerInteractor: PlayerInteractor
     private lateinit var backButton: ImageButton
     private lateinit var trackNameValue: TextView
     private lateinit var artistNameValue: TextView
@@ -55,8 +55,7 @@ class AudioPlayerActivity : AppCompatActivity(), PlayerInteractorImpl.PlayerStat
         }
 
         playerInteractor = Creator.providePlayerInteractor()
-        currentTrack = intent.getParcelableExtra<Track>(TracksAdapter.TRACK)!!
-        if (currentTrack == null) {
+        currentTrack = intent.getParcelableExtra<Track>(TracksAdapter.TRACK) ?: run {
             Toast.makeText(this, "Трек не найден", Toast.LENGTH_SHORT).show()
             finish()
             return
@@ -104,15 +103,15 @@ class AudioPlayerActivity : AppCompatActivity(), PlayerInteractorImpl.PlayerStat
         playerInteractor.prepare(currentTrack.previewUrl, this)
     }
 
-    override fun onStateChanged(state: PlayerInteractorImpl.PlayerState) {
+    override fun onStateChanged(state: PlayerInteractor.PlayerState) {
         when(state) {
-            PlayerInteractorImpl.PlayerState.PREPARED ->
+            PlayerInteractor.PlayerState.PREPARED ->
                 playButton.setImageResource(R.drawable.play_button)
-            PlayerInteractorImpl.PlayerState.PLAYING ->
+            PlayerInteractor.PlayerState.PLAYING ->
                 playButton.setImageResource(R.drawable.pause_button)
-            PlayerInteractorImpl.PlayerState.PAUSED ->
+            PlayerInteractor.PlayerState.PAUSED ->
                 playButton.setImageResource(R.drawable.play_button)
-            PlayerInteractorImpl.PlayerState.COMPLETED -> {
+            PlayerInteractor.PlayerState.COMPLETED -> {
                 playButton.setImageResource(R.drawable.play_button)
                 playbackProgress.text = formatTime(0)
             }
