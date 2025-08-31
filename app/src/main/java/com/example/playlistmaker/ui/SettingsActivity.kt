@@ -1,20 +1,30 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.SwitchCompat
+import com.example.playlistmaker.Creator
+import com.example.playlistmaker.presentation.App
+import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.impl.ThemeInteractor
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
 
 class SettingsActivity : AppCompatActivity() {
+    private lateinit var themeInteractor: ThemeInteractor
+    private lateinit var themeSwitcher: SwitchMaterial
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
+        themeInteractor = Creator.provideThemeInteractor(this)
         val backButton = findViewById<MaterialToolbar>(R.id.mt_back_button)
-        val themeSwitcher = findViewById<SwitchMaterial>(R.id.sm_theme_switcher)
+        themeSwitcher = findViewById<SwitchMaterial>(R.id.sm_theme_switcher)
         val shareButton = findViewById<MaterialTextView>(R.id.mtv_share_button)
         val supportButton = findViewById<MaterialTextView>(R.id.mtv_support_button)
         val agreementButton = findViewById<MaterialTextView>(R.id.mtv_agreement_button)
@@ -27,8 +37,9 @@ class SettingsActivity : AppCompatActivity() {
 
         updateThemeSwitcher(themeSwitcher)
 
-        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
-            (applicationContext as? App)?.switchTheme(checked)
+        themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
+            themeInteractor.setDarkThemeEnabled(isChecked)
+            applyTheme(isChecked)
         }
 
         shareButton.setOnClickListener {
@@ -45,7 +56,15 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun updateThemeSwitcher(themeSwitcher: SwitchMaterial) {
-        themeSwitcher.isChecked = (application as? App)?.darkTheme ?: false
+        themeSwitcher.isChecked = themeInteractor.getCurrentTheme()
+    }
+
+    private fun applyTheme(isDarkTheme: Boolean) {
+        if (isDarkTheme) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
     }
 
     private fun shareApp() {
