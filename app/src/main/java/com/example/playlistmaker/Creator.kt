@@ -1,7 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.Context
-import com.example.playlistmaker.data.PreferencesManager
+import com.example.playlistmaker.data.AppPreferences
 import com.example.playlistmaker.domain.impl.SearchHistoryInteractor
 import com.example.playlistmaker.data.impl.PlayerRepositoryImpl
 import com.example.playlistmaker.data.impl.PreferencesRepositoryImpl
@@ -13,6 +13,7 @@ import com.example.playlistmaker.domain.api.SearchInteractor
 import com.example.playlistmaker.domain.api.TracksRepository
 import com.example.playlistmaker.domain.impl.PlayerInteractorImpl
 import com.example.playlistmaker.domain.impl.SearchInteractorImpl
+import com.example.playlistmaker.domain.impl.ThemeInteractor
 
 object Creator {
 
@@ -29,8 +30,13 @@ object Creator {
     }
 
     fun providePreferencesRepository(context: Context): PreferencesRepository {
-        val preferencesManager = PreferencesManager(context)
-        return PreferencesRepositoryImpl(preferencesManager)
+        val appPreferences = AppPreferences(context)
+        return PreferencesRepositoryImpl(appPreferences)
+    }
+
+    fun provideThemeInteractor(context: Context): ThemeInteractor {
+        val repository = providePreferencesRepository(context)
+        return ThemeInteractor(repository)
     }
 
     fun provideSearchHistoryInteractor(context: Context): SearchHistoryInteractor {

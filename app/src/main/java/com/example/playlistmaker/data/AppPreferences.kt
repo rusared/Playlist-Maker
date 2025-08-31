@@ -3,33 +3,21 @@ package com.example.playlistmaker.data
 import android.content.Context
 import android.content.SharedPreferences
 
-class PreferencesManager(context: Context) {
-    val sharedPreferences: SharedPreferences = context.getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, Context.MODE_PRIVATE)
-
+class AppPreferences(context: Context) {
+    val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, Context.MODE_PRIVATE)
 
     var isThemeSet: Boolean
         get() = sharedPreferences.getBoolean(IS_THEME_SET_KEY, false)
-        set(value) {
-            sharedPreferences.edit()
-                .putBoolean(IS_THEME_SET_KEY, value)
-                .apply()
-        }
+        set(value) = sharedPreferences.edit().putBoolean(IS_THEME_SET_KEY, value).apply()
 
     var isDarkTheme: Boolean
         get() = sharedPreferences.getBoolean(IS_DARK_THEME_KEY, false)
-        set(value) {
-            sharedPreferences.edit()
-                .putBoolean(IS_DARK_THEME_KEY, value)
-                .apply()
-        }
+        set(value) = sharedPreferences.edit().putBoolean(IS_DARK_THEME_KEY, value).apply()
 
     var searchHistoryList: String?
         get() = sharedPreferences.getString(SEARCH_HISTORY_LIST_KEY, "")
-        set(value) {
-            sharedPreferences.edit()
-                .putString(SEARCH_HISTORY_LIST_KEY, value)
-                .apply()
-        }
+        set(value) = sharedPreferences.edit().putString(SEARCH_HISTORY_LIST_KEY, value).apply()
 
     companion object {
         const val PLAYLIST_MAKER_PREFERENCES = "playlist_maker_preferences"
