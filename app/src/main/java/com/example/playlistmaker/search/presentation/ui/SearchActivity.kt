@@ -15,18 +15,19 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
-import com.example.playlistmaker.search.SearchInteractor
-import com.example.playlistmaker.search.SearchHistoryInteractor
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.player.presentation.ui.AudioPlayerActivity
+import com.example.playlistmaker.search.presentation.view_model.SearchViewModel
+import com.example.playlistmaker.search.presentation.view_model.SearchViewModel.SearchState
 import com.google.android.material.appbar.MaterialToolbar
 
-class SearchActivity : AppCompatActivity(), SearchInteractor.TracksConsumer {
+class SearchActivity : AppCompatActivity() {
 
     private lateinit var backButton: MaterialToolbar
     private lateinit var queryInput: EditText
@@ -44,30 +45,31 @@ class SearchActivity : AppCompatActivity(), SearchInteractor.TracksConsumer {
     private lateinit var tracksAdapter: TracksAdapter
     private lateinit var tracksHistoryAdapter: TracksAdapter
 
-    private lateinit var searchInteractor: SearchInteractor
-    private lateinit var searchHistoryInteractor: SearchHistoryInteractor
-
-    private val tracks = ArrayList<Track>()
-    private var tracksHistory = ArrayList<Track>()
-    private var currentRequestStatus = RequestStatus.SUCCESS
-    private var valueEditText: String? = null
+    private val viewModel: SearchViewModel by viewModels {
+        Creator.provideSearchViewModelFactory(this)
+    }
 
     private val handler = Handler(Looper.getMainLooper())
-    private val searchRunnable = Runnable { responseHandler() }
-
-    enum class RequestStatus {
-        SUCCESS,
-        NOTHING_FOUND,
-        CONNECTION_PROBLEM
-    }
+    private var valueEditText: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        searchInteractor = Creator.provideSearchInteractor()
-        searchHistoryInteractor = Creator.provideSearchHistoryInteractor(this)
+        initViews()
+        setupAdapters()
+        setupObservers()
+        setupClickListeners()
+        setupTextWatcher()
 
+        viewModel.setupSearchRunnable {
+            performSearch()
+        }
+        queryInput.requestFocus()
+    }
+
+
+    private fun initViews() {
         backButton = findViewById(R.id.mt_search_back_button)
         queryInput = findViewById(R.id.et_query_input)
         clearButton = findViewById(R.id.iv_clear_icon)
@@ -82,209 +84,186 @@ class SearchActivity : AppCompatActivity(), SearchInteractor.TracksConsumer {
         clearHistoryButton = findViewById(R.id.b_track_history_clear)
 
         setSupportActionBar(backButton)
+    }
 
-        tracksHistory = ArrayList(searchHistoryInteractor.getHistory())
-
+    private fun setupAdapters() {
         val trackClickListener: (Track) -> Unit = { track ->
             val intent = Intent(this, AudioPlayerActivity::class.java).apply {
-                putExtra(TracksAdapter.Companion.TRACK, track)
+                putExtra(TracksAdapter.TRACK, track)
             }
             startActivity(intent)
-            searchHistoryInteractor.addToHistory(track)
-            updateHistoryUI()
+            viewModel.addTrackToHistory(track)
         }
 
-        tracksAdapter = TracksAdapter(tracks, trackClickListener)
-        tracksHistoryAdapter = TracksAdapter(tracksHistory, trackClickListener)
-
-        clearButton.setOnClickListener {
-            queryInput.setText("")
-            tracks.clear()
-            tracksList.visibility = View.GONE
-            tracksAdapter.notifyDataSetChanged()
-            placeholderMessage.visibility = View.GONE
-            val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
-            inputMethodManager?.hideSoftInputFromWindow(queryInput.windowToken, 0)
-        }
-
-        placeholderMessageButton.setOnClickListener {
-            responseHandler()
-        }
-
-        clearHistoryButton.setOnClickListener {
-            searchHistoryInteractor.clearHistory()
-            tracksHistory.clear()
-            tracksHistoryAdapter.notifyDataSetChanged()
-            historyView.visibility = View.GONE
-            updateHistoryUI()
-        }
-
-        backButton.setNavigationOnClickListener {
-            finish()
-        }
-
-        val simpleTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                // empty
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                clearButton.visibility = clearButtonVisibility(s)
-                valueEditText = s?.toString()
-                historyView.visibility = historyViewVisibility(s)
-                if (s.isNullOrEmpty()==false) searchDebounce()
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                // empty
-            }
-        }
-
-        queryInput.addTextChangedListener(simpleTextWatcher)
+        tracksAdapter = TracksAdapter(emptyList(), trackClickListener)
+        tracksHistoryAdapter = TracksAdapter(emptyList(), trackClickListener)
 
         tracksList.layoutManager = LinearLayoutManager(this)
         tracksHistoryList.layoutManager = LinearLayoutManager(this)
         tracksList.adapter = tracksAdapter
         tracksHistoryList.adapter = tracksHistoryAdapter
+    }
+
+    private fun setupObservers() {
+        viewModel.observeState.observe(this) { state ->
+            handleSearchState(state)
+        }
+
+        viewModel.observeHistory.observe(this) { history ->
+            handleHistory(history)
+        }
+    }
+
+    private fun handleSearchState(state: SearchState) {
+        progressBar.visibility = if (state is SearchState.Loading) View.VISIBLE else View.GONE
+        tracksList.visibility = if (state is SearchState.Content) View.VISIBLE else View.GONE
+        placeholderMessage.visibility = if (state is SearchState.Empty || state is SearchState.Error) View.VISIBLE else View.GONE
+
+        when (state) {
+            is SearchState.Default -> {
+                showSearchHistory()
+            }
+            is SearchState.Loading -> {
+                hideSearchHistory()
+            }
+            is SearchState.Content -> {
+                hideSearchHistory()
+                tracksAdapter.updateTracks(state.tracks)
+            }
+            is SearchState.Empty -> {
+                hideSearchHistory()
+                showEmptyState()
+            }
+            is SearchState.Error -> {
+                hideSearchHistory()
+                showErrorState()
+            }
+        }
+    }
+
+    private fun handleHistory(history: List<Track>) {
+        tracksHistoryAdapter.updateTracks(history)
+        val shouldShowHistory = history.isNotEmpty() &&
+                queryInput.text.isEmpty() &&
+                queryInput.hasFocus()
+        historyView.visibility = if (shouldShowHistory) View.VISIBLE else View.GONE
+    }
+
+    private fun setupClickListeners() {
+        clearButton.setOnClickListener {
+            queryInput.setText("")
+            viewModel.clearSearch()
+            hideKeyboard()
+        }
+
+        placeholderMessageButton.setOnClickListener {
+            performSearch()
+        }
+
+        clearHistoryButton.setOnClickListener {
+            viewModel.clearSearchHistory()
+        }
+
+        backButton.setNavigationOnClickListener {
+            finish()
+        }
+    }
+
+
+    private fun setupTextWatcher() {
+        val simpleTextWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                clearButton.visibility = clearButtonVisibility(s)
+                valueEditText = s?.toString()
+
+                if (s.isNullOrEmpty()) {
+                    viewModel.clearSearch()
+                    viewModel.loadSearchHistory()
+                    showSearchHistory()
+                } else {
+                    viewModel.searchDebounce()
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        }
+
+        queryInput.addTextChangedListener(simpleTextWatcher)
 
         queryInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 if (queryInput.text.isNotEmpty()) {
-                    responseHandler()
+                    performSearch()
                 }
                 true
+            } else {
+                false
             }
-            false
         }
-        queryInput.setOnFocusChangeListener { view, hasFocus ->
-            historyView.visibility = if (hasFocus && queryInput.text.isEmpty() && tracksHistory.isNotEmpty()) View.VISIBLE else View.GONE
-        }
-        queryInput.requestFocus()
-    }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString(VALUE_EDIT_TEXT, valueEditText)
-        outState.putSerializable(TRACKS, tracks)
-        outState.putSerializable(TRACKS_HISTORY, tracksHistory)
-        outState.putString(CURRENT_REQUEST_STATUS, currentRequestStatus.name)
-        outState.putInt(PLACEHOLDER_VISIBILITY, placeholderMessage.visibility)
-        outState.putInt(HISTORY_VIEW_VISIBILITY, historyView.visibility)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-
-        valueEditText = savedInstanceState.getString(VALUE_EDIT_TEXT)
-        queryInput.setText(valueEditText ?: "")
-
-        val savedTracks = savedInstanceState.getSerializable(TRACKS) as? ArrayList<Track> ?: ArrayList()
-        tracks.clear()
-        tracks.addAll(savedTracks)
-
-        val savedTracksHistory = savedInstanceState.getSerializable(TRACKS_HISTORY) as? ArrayList<Track> ?: ArrayList()
-        tracksHistory.clear()
-        tracksHistory.addAll(savedTracksHistory)
-
-        currentRequestStatus = RequestStatus.valueOf(
-            savedInstanceState.getString(CURRENT_REQUEST_STATUS, RequestStatus.SUCCESS.name)
-        )
-
-        tracksAdapter.notifyDataSetChanged()
-        tracksHistoryAdapter.notifyDataSetChanged()
-
-        showMessage(currentRequestStatus)
-        placeholderMessage.visibility = savedInstanceState.getInt(PLACEHOLDER_VISIBILITY)
-        historyView.visibility = savedInstanceState.getInt(HISTORY_VIEW_VISIBILITY)
-
-    }
-
-    override fun onResume() {
-        super.onResume()
-        updateHistoryUI()
-    }
-
-    private fun responseHandler() {
-        tracksList.visibility = View.GONE
-        placeholderMessage.visibility = View.GONE
-        progressBar.visibility = View.VISIBLE
-        searchInteractor.searchTracks(queryInput.text.toString(), this)
-    }
-
-    override fun consume(foundTracks: List<Track>, status: RequestStatus) {
-        runOnUiThread {
-            progressBar.visibility = View.GONE
-            tracksList.visibility = View.VISIBLE
-            tracksAdapter.updateTracks(foundTracks)
-            showMessage(status)
+        queryInput.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && queryInput.text.isEmpty()) {
+                viewModel.loadSearchHistory()
+            }
         }
     }
 
-    private fun historyViewVisibility(s: CharSequence?): Int {
-        if (queryInput.hasFocus() && tracksHistory.isNotEmpty() && s?.isEmpty() == true) {
-            tracks.clear()
-            tracksAdapter.notifyDataSetChanged()
-            placeholderMessage.visibility = View.GONE
-            return View.VISIBLE
-        } else {
-            return View.GONE
+    private fun performSearch() {
+        val query = queryInput.text.toString()
+        if (query.isNotEmpty()) {
+            viewModel.searchTracks(query)
         }
+    }
+
+    private fun showSearchHistory() {
+        val hasHistory = !viewModel.observeHistory.value.isNullOrEmpty()
+        historyView.visibility = if (hasHistory && queryInput.text.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    private fun hideSearchHistory() {
+        historyView.visibility = View.GONE
+    }
+
+    private fun showEmptyState() {
+        placeholderMessageText.text = getString(R.string.nothing_found)
+        placeholderMessageImage.setImageResource(R.drawable.nothing_found_placeholder)
+        placeholderMessageButton.visibility = View.GONE
+    }
+
+    private fun showErrorState() {
+        placeholderMessageText.text = getString(R.string.connection_problem)
+        placeholderMessageImage.setImageResource(R.drawable.connection_problem_placeholder)
+        placeholderMessageButton.visibility = View.VISIBLE
     }
 
     private fun clearButtonVisibility(s: CharSequence?): Int {
         return if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
     }
 
-    private fun searchDebounce() {
-        handler.removeCallbacks(searchRunnable)
-        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    private fun hideKeyboard() {
+        val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
+        inputMethodManager?.hideSoftInputFromWindow(queryInput.windowToken, 0)
     }
 
-    private fun showMessage(requestStatus: RequestStatus) {
-        when (requestStatus) {
-
-            RequestStatus.SUCCESS -> {
-                placeholderMessage.visibility = View.GONE
-            }
-
-            RequestStatus.NOTHING_FOUND -> {
-                placeholderMessage.visibility = View.VISIBLE
-                tracks.clear()
-                tracksAdapter.notifyDataSetChanged()
-                placeholderMessageText.text = getString(R.string.nothing_found)
-                placeholderMessageImage.setImageDrawable(getDrawable(R.drawable.nothing_found_placeholder))
-                placeholderMessageButton.visibility = View.GONE
-            }
-
-            RequestStatus.CONNECTION_PROBLEM -> {
-                placeholderMessage.visibility = View.VISIBLE
-                tracks.clear()
-                tracksAdapter.notifyDataSetChanged()
-                placeholderMessageText.text = getString(R.string.connection_problem)
-                placeholderMessageImage.setImageDrawable(getDrawable(R.drawable.connection_problem_placeholder))
-                placeholderMessageButton.visibility = View.VISIBLE
-            }
-        }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(VALUE_EDIT_TEXT, valueEditText)
     }
 
-    private fun updateHistoryUI() {
-        tracksHistory.clear()
-        tracksHistory.addAll(searchHistoryInteractor.getHistory())
-        tracksHistoryAdapter.notifyDataSetChanged()
-        historyView.visibility = if (tracksHistory.isNotEmpty() && queryInput.text.isEmpty()) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        valueEditText = savedInstanceState.getString(VALUE_EDIT_TEXT)
+        queryInput.setText(valueEditText ?: "")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadSearchHistory()
     }
 
     companion object {
         private const val VALUE_EDIT_TEXT = "value_edit_text"
-        private const val TRACKS = "tracks"
-        private const val TRACKS_HISTORY = "tracks_history"
-        private const val CURRENT_REQUEST_STATUS = "current_request_status"
-        private const val PLACEHOLDER_VISIBILITY = "placeholder_visibility"
-        private const val HISTORY_VIEW_VISIBILITY = "history_view_visibility"
-        private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 }

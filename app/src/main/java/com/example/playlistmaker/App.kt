@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.app.Application
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.settings.domain.interactor.SettingsInteractor
@@ -11,6 +12,14 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        // Глобальный обработчик непойманных исключений
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            Log.e("App", "Uncaught exception in thread: ${thread.name}", throwable)
+            throwable.printStackTrace()
+            // Можно добавить отправку ошибки в аналитику
+        }
+
         settingsInteractor = Creator.provideSettingsInteractor(this)
         applyTheme()
     }

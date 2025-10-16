@@ -7,7 +7,7 @@ import com.example.playlistmaker.sharing.domain.interactor.SharingInteractor
 
 class SettingsViewModelFactory(
     private val sharingInteractor: SharingInteractor,
-    private val settingsInteractor: SettingsInteractor,
+    private val settingsInteractor: SettingsInteractor
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")

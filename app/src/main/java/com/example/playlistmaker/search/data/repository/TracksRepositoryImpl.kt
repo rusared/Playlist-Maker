@@ -1,6 +1,6 @@
 package com.example.playlistmaker.search.data.repository
 
-import com.example.playlistmaker.search.TracksRepository
+import com.example.playlistmaker.search.domain.repository.TracksRepository
 import com.example.playlistmaker.search.data.network.NetworkClient
 import com.example.playlistmaker.search.data.network.dto.TracksSearchRequest
 import com.example.playlistmaker.search.data.network.dto.TracksSearchResponse
@@ -12,10 +12,9 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRep
 
     override fun searchTracks(term: String): List<Track> {
         val response = networkClient.doRequest(TracksSearchRequest(term))
-
         return if (response.isSuccessful) {
             val tracksResponse = response.body() as? TracksSearchResponse
-            tracksResponse?.results?.map { dto ->
+            val tracks = tracksResponse?.results?.map { dto ->
                 Track(
                     trackName = dto.trackName,
                     artistName = dto.artistName,
@@ -32,6 +31,8 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRep
                     previewUrl = dto.previewUrl.toString()
                 )
             } ?: emptyList()
+            tracks
+
         } else {
             emptyList()
         }

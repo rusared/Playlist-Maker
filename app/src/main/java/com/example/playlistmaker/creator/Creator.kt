@@ -8,11 +8,12 @@ import com.example.playlistmaker.search.data.repository.TracksRepositoryImpl
 import com.example.playlistmaker.search.data.network.RetrofitNetworkClient
 import com.example.playlistmaker.player.domain.PlayerInteractor
 import com.example.playlistmaker.settings.domain.repository.PreferencesRepository
-import com.example.playlistmaker.search.SearchInteractor
-import com.example.playlistmaker.search.TracksRepository
+import com.example.playlistmaker.search.domain.interactor.SearchInteractor
+import com.example.playlistmaker.search.domain.repository.TracksRepository
 import com.example.playlistmaker.player.domain.PlayerInteractorImpl
-import com.example.playlistmaker.search.SearchHistoryInteractor
-import com.example.playlistmaker.search.SearchInteractorImpl
+import com.example.playlistmaker.search.domain.interactor.SearchHistoryInteractor
+import com.example.playlistmaker.search.domain.interactor.SearchInteractorImpl
+import com.example.playlistmaker.search.presentation.view_model.SearchViewModelFactory
 import com.example.playlistmaker.settings.domain.interactor.SettingsInteractor
 import com.example.playlistmaker.settings.domain.interactor.SettingsInteractorImpl
 import com.example.playlistmaker.settings.domain.repository.SettingsRepository
@@ -75,10 +76,18 @@ object Creator {
         return SharingRepositoryImpl(context)
     }
 
-    // ViewModel Factory
+    // SettingsViewModel Factory
     fun provideSettingsViewModelFactory(context: Context): SettingsViewModelFactory {
         val sharingInteractor = provideSharingInteractor(context)
         val settingsInteractor = provideSettingsInteractor(context)
         return SettingsViewModelFactory(sharingInteractor, settingsInteractor)
+    }
+
+    // SearchViewModel Factory
+    fun provideSearchViewModelFactory(context: Context): SearchViewModelFactory {
+        return SearchViewModelFactory(
+            provideSearchInteractor(),
+            provideSearchHistoryInteractor(context)
+        )
     }
 }

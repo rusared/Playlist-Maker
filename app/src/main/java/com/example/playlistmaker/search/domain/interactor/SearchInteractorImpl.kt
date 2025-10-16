@@ -1,6 +1,7 @@
-package com.example.playlistmaker.search
+package com.example.playlistmaker.search.domain.interactor
 
-import com.example.playlistmaker.search.presentation.ui.SearchActivity
+import com.example.playlistmaker.search.domain.repository.TracksRepository
+import com.example.playlistmaker.search.presentation.view_model.SearchViewModel.SearchStatus
 import java.util.concurrent.Executors
 
 class SearchInteractorImpl(private val repository: TracksRepository) : SearchInteractor {
@@ -12,13 +13,13 @@ class SearchInteractorImpl(private val repository: TracksRepository) : SearchInt
             try {
                 val tracks = repository.searchTracks(term)
                 val status = if (tracks.isEmpty()) {
-                    SearchActivity.RequestStatus.NOTHING_FOUND
+                    SearchStatus.NOTHING_FOUND
                 } else {
-                    SearchActivity.RequestStatus.SUCCESS
+                    SearchStatus.SUCCESS
                 }
                 consumer.consume(tracks, status)
             } catch (e: Exception) {
-                consumer.consume(emptyList(), SearchActivity.RequestStatus.CONNECTION_PROBLEM)
+                consumer.consume(emptyList(), SearchStatus.CONNECTION_PROBLEM)
             }
         }
     }
