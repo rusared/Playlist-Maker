@@ -1,7 +1,5 @@
 package com.example.playlistmaker.search.presentation.view_model
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -20,43 +18,34 @@ class SearchViewModel(
     private val history = MutableLiveData<List<Track>>()
     val observeHistory: LiveData<List<Track>> get() = history
 
-    private val handler = Handler(Looper.getMainLooper())
-    private var searchRunnable = Runnable { }
-
-    //Детальное логирование
-
+    private val searchConsumer = object : SearchInteractor.TracksConsumer {
+        override fun consume(foundTracks: List<Track>, status: SearchStatus) {
+            val newState = when (status) {
+                SearchStatus.SUCCESS -> SearchState.Content(foundTracks)
+                SearchStatus.NOTHING_FOUND -> SearchState.Empty
+                SearchStatus.CONNECTION_PROBLEM -> SearchState.Error
+            }
+            state.postValue(newState)
+        }
+    }
 
     init {
         loadSearchHistory()
     }
 
-    fun setupSearchRunnable(searchAction: () -> Unit) {
-        handler.removeCallbacks(searchRunnable)
-        searchRunnable = Runnable { searchAction() }
-    }
-
-    fun searchDebounce() {
-        handler.removeCallbacks(searchRunnable)
-        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
-    }
-
-    fun searchTracks(query: String) {
+    fun searchDebounce(query: String) {
         if (query.isEmpty()) return
+        searchInteractor.setupDebounce(query, searchConsumer)
+    }
 
+    fun searchTracksImmediately(query: String) {
+        if (query.isEmpty()) return
         state.postValue(SearchState.Loading)
+        searchInteractor.searchTracks(query, searchConsumer)
+    }
 
-        searchInteractor.searchTracks(query, object : SearchInteractor.TracksConsumer {
-            override fun consume(foundTracks: List<Track>, status: SearchStatus) {
-                handler.post {
-                    val newState = when (status) {
-                        SearchStatus.SUCCESS -> SearchState.Content(foundTracks)
-                        SearchStatus.NOTHING_FOUND -> SearchState.Empty
-                        SearchStatus.CONNECTION_PROBLEM -> SearchState.Error
-                    }
-                    state.value = newState
-                }
-            }
-        })
+    fun cancelSearch() {
+        searchInteractor.cancelDebounce()
     }
 
     fun addTrackToHistory(track: Track) {
@@ -79,7 +68,7 @@ class SearchViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        handler.removeCallbacks(searchRunnable)
+        searchInteractor.cancelDebounce()
     }
 
     sealed class SearchState {
@@ -94,9 +83,5 @@ class SearchViewModel(
         SUCCESS,
         NOTHING_FOUND,
         CONNECTION_PROBLEM
-    }
-
-    companion object {
-        private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 }

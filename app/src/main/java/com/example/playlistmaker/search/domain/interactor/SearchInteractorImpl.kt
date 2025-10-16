@@ -4,7 +4,10 @@ import com.example.playlistmaker.search.domain.repository.TracksRepository
 import com.example.playlistmaker.search.presentation.view_model.SearchViewModel.SearchStatus
 import java.util.concurrent.Executors
 
-class SearchInteractorImpl(private val repository: TracksRepository) : SearchInteractor {
+class SearchInteractorImpl(
+    private val repository: TracksRepository,
+    private val debounceInteractor: DebounceInteractor = DebounceInteractor()
+) : SearchInteractor {
 
     private val executor = Executors.newCachedThreadPool()
 
@@ -22,5 +25,19 @@ class SearchInteractorImpl(private val repository: TracksRepository) : SearchInt
                 consumer.consume(emptyList(), SearchStatus.CONNECTION_PROBLEM)
             }
         }
+    }
+
+    override fun setupDebounce(term: String, consumer: SearchInteractor.TracksConsumer) {
+        debounceInteractor.debounce(SEARCH_DEBOUNCE_DELAY) {
+            searchTracks(term, consumer)
+        }
+    }
+
+    override fun cancelDebounce() {
+        debounceInteractor.cancel()
+    }
+
+    private companion object {
+        const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 }

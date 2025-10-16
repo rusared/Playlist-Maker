@@ -2,8 +2,6 @@ package com.example.playlistmaker.search.presentation.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -49,7 +47,6 @@ class SearchActivity : AppCompatActivity() {
         Creator.provideSearchViewModelFactory(this)
     }
 
-    private val handler = Handler(Looper.getMainLooper())
     private var valueEditText: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,9 +59,6 @@ class SearchActivity : AppCompatActivity() {
         setupClickListeners()
         setupTextWatcher()
 
-        viewModel.setupSearchRunnable {
-            performSearch()
-        }
         queryInput.requestFocus()
     }
 
@@ -179,11 +173,12 @@ class SearchActivity : AppCompatActivity() {
                 valueEditText = s?.toString()
 
                 if (s.isNullOrEmpty()) {
+                    viewModel.cancelSearch()
                     viewModel.clearSearch()
                     viewModel.loadSearchHistory()
                     showSearchHistory()
                 } else {
-                    viewModel.searchDebounce()
+                    viewModel.searchDebounce(s.toString())
                 }
             }
 
@@ -195,6 +190,7 @@ class SearchActivity : AppCompatActivity() {
         queryInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 if (queryInput.text.isNotEmpty()) {
+                    viewModel.cancelSearch()
                     performSearch()
                 }
                 true
@@ -213,7 +209,7 @@ class SearchActivity : AppCompatActivity() {
     private fun performSearch() {
         val query = queryInput.text.toString()
         if (query.isNotEmpty()) {
-            viewModel.searchTracks(query)
+            viewModel.searchTracksImmediately(query)
         }
     }
 
