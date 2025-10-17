@@ -72,11 +72,11 @@ class SearchViewModel(
         searchInteractor.cancelDebounce()
     }
 
-    sealed class SearchState {
-        object Default : SearchState()
-        object Loading : SearchState()
-        object Empty : SearchState()
-        object Error : SearchState()
-        data class Content(val tracks: List<Track>) : SearchState()
+    sealed interface SearchState {
+        object Default : SearchState
+        object Loading : SearchState
+        object Empty : SearchState
+        object Error : SearchState
+        data class Content(val tracks: List<Track>) : SearchState
     }
 }

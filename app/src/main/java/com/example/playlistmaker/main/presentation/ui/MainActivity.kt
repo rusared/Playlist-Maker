@@ -1,4 +1,4 @@
-package com.example.playlistmaker.main.ui
+package com.example.playlistmaker.main.presentation.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,10 +10,13 @@ import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.search.presentation.ui.SearchActivity
 import com.example.playlistmaker.settings.presentation.ui.SettingsActivity
 import com.example.playlistmaker.library.ui.LibraryActivity
-import com.example.playlistmaker.main.domain.model.NavigationEvent
-import com.example.playlistmaker.main.ui.view_model.MainViewModel
+import com.example.playlistmaker.main.presentation.view_model.MainViewModel
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var searchButton: Button
+    private lateinit var libraryButton: Button
+    private lateinit var settingsButton: Button
 
     private val viewModel: MainViewModel by viewModels {
         Creator.provideMainViewModelFactory()
@@ -23,9 +26,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val searchButton = findViewById<Button>(R.id.main_search_button)
-        val libraryButton = findViewById<Button>(R.id.main_library_button)
-        val settingsButton = findViewById<Button>(R.id.main_settings_button)
+        initViews()
+        setupClickListeners()
+        observeNavigationEvents()
+    }
+
+    private fun initViews() {
+        searchButton = findViewById(R.id.main_search_button)
+        libraryButton = findViewById(R.id.main_library_button)
+        settingsButton = findViewById(R.id.main_settings_button)
+    }
+
+    private fun setupClickListeners() {
 
         searchButton.setOnClickListener {
             viewModel.onSearchClicked()
@@ -38,17 +50,19 @@ class MainActivity : AppCompatActivity() {
         settingsButton.setOnClickListener {
             viewModel.onSettingsClicked()
         }
-
-        observeNavigationEvents()
     }
 
     private fun observeNavigationEvents() {
-        viewModel.observeNavigationEvent.observe(this) { event ->
-            when (event) {
-                is NavigationEvent.Search -> navigateToSearch()
-                is NavigationEvent.Library -> navigateToLibrary()
-                is NavigationEvent.Settings -> navigateToSettings()
-            }
+        viewModel.observeSearchClicked.observe(this) {
+            navigateToSearch()
+        }
+
+        viewModel.observeLibraryClicked.observe(this) {
+            navigateToLibrary()
+        }
+
+        viewModel.observeSettingsClicked.observe(this) {
+            navigateToSettings()
         }
     }
 

@@ -1,4 +1,4 @@
-package com.example.playlistmaker.main.ui.view_model
+package com.example.playlistmaker.main.presentation.view_model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
