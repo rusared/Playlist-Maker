@@ -14,8 +14,10 @@ import com.example.playlistmaker.search.domain.repository.TracksRepository
 import com.example.playlistmaker.player.domain.interactor.PlayerInteractorImpl
 import com.example.playlistmaker.player.domain.repository.PlayerRepository
 import com.example.playlistmaker.player.presentation.view_model.PlayerViewModelFactory
+import com.example.playlistmaker.search.data.repository.SearchHistoryRepositoryImpl
 import com.example.playlistmaker.search.domain.interactor.SearchHistoryInteractor
 import com.example.playlistmaker.search.domain.interactor.SearchInteractorImpl
+import com.example.playlistmaker.search.domain.repository.SearchHistoryRepository
 import com.example.playlistmaker.search.presentation.view_model.SearchViewModelFactory
 import com.example.playlistmaker.settings.domain.interactor.SettingsInteractor
 import com.example.playlistmaker.settings.domain.interactor.SettingsInteractorImpl
@@ -44,9 +46,14 @@ object Creator {
         return PreferencesRepositoryImpl(appPreferences)
     }
 
+    private fun provideSearchHistoryRepository(context: Context): SearchHistoryRepository {
+        val preferencesRepository = providePreferencesRepository(context)
+        return SearchHistoryRepositoryImpl(preferencesRepository)
+    }
+
     fun provideSearchHistoryInteractor(context: Context): SearchHistoryInteractor {
-        val repository = providePreferencesRepository(context)
-        return SearchHistoryInteractor(repository)
+        val searchHistoryRepository = provideSearchHistoryRepository(context)
+        return SearchHistoryInteractor(searchHistoryRepository)
     }
 
     // Settings
