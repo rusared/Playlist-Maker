@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-        android:name=".presentation.App"
+        android:name=".App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -19,20 +19,20 @@
         tools:targetApi="35">
 
         <activity
-            android:name=".ui.player.AudioPlayerActivity"
+            android:name=".player.presentation.ui.PlayerActivity"
             android:screenOrientation="portrait"
             android:exported="false" />
         <activity
-            android:name=".ui.LibraryActivity"
+            android:name=".library.ui.LibraryActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.SearchActivity"
+            android:name=".search.presentation.ui.SearchActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.SettingsActivity"
+            android:name=".settings.presentation.ui.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".main.presentation.ui.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
