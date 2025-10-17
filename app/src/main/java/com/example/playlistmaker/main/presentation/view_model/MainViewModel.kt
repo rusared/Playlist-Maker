@@ -2,7 +2,7 @@ package com.example.playlistmaker.main.presentation.view_model
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.example.playlistmaker.main.presentation.utils.SingleLiveEvent
+import com.example.playlistmaker.utils.SingleLiveEvent
 
 class MainViewModel : ViewModel() {
 

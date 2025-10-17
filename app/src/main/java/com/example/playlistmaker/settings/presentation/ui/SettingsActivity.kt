@@ -14,6 +14,7 @@ import com.google.android.material.textview.MaterialTextView
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var themeSwitcher: SwitchMaterial
+    private var isFromUserInteraction = false
 
     private val viewModel: SettingsViewModel by viewModels {
         Creator.provideSettingsViewModelFactory(this)
@@ -37,8 +38,13 @@ class SettingsActivity : AppCompatActivity() {
         setSupportActionBar(backButton)
         backButton.setNavigationOnClickListener { finish() }
 
+        themeSwitcher.setOnCheckedChangeListener(null)
+        themeSwitcher.isChecked = viewModel.observeThemeState.value?.isDarkTheme ?: false
+
         themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.onThemeChanged(isChecked)
+            if (isFromUserInteraction) {
+                viewModel.onThemeChanged(isChecked)
+            }
         }
 
         shareButton.setOnClickListener { viewModel.onShareAppClicked() }
@@ -48,7 +54,10 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun setupObservers() {
         viewModel.observeThemeState.observe(this, Observer { themeSettings ->
+            isFromUserInteraction = false
             themeSwitcher.isChecked = themeSettings.isDarkTheme
+            isFromUserInteraction = true
+
             applyTheme(themeSettings.isDarkTheme)
         })
     }
