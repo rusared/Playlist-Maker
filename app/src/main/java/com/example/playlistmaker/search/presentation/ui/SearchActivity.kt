@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.search.domain.model.Track
-import com.example.playlistmaker.player.presentation.ui.AudioPlayerActivity
+import com.example.playlistmaker.player.presentation.ui.PlayerActivity
 import com.example.playlistmaker.search.presentation.view_model.SearchViewModel
 import com.example.playlistmaker.search.presentation.view_model.SearchViewModel.SearchState
 import com.google.android.material.appbar.MaterialToolbar
@@ -82,7 +82,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun setupAdapters() {
         val trackClickListener: (Track) -> Unit = { track ->
-            val intent = Intent(this, AudioPlayerActivity::class.java).apply {
+            val intent = Intent(this, PlayerActivity::class.java).apply {
                 putExtra(TracksAdapter.TRACK, track)
             }
             startActivity(intent)

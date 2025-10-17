@@ -1,29 +1,74 @@
 package com.example.playlistmaker.player.data
 
 import android.media.MediaPlayer
-import com.example.playlistmaker.player.domain.PlayerInteractor
+import android.os.Handler
+import android.os.Looper
+import com.example.playlistmaker.player.domain.interactor.PlayerInteractor
+import com.example.playlistmaker.player.domain.repository.PlayerRepository
 
-class PlayerRepositoryImpl : PlayerInteractor {
+class PlayerRepositoryImpl : PlayerRepository {
     private val mediaPlayer = MediaPlayer()
+    private val handler = Handler(Looper.getMainLooper())
+    private var progressRunnable: Runnable? = null
+    private var progressListener: PlayerInteractor.PlayerStateListener? = null
 
     override fun prepare(url: String, listener: PlayerInteractor.PlayerStateListener) {
+        this.progressListener = listener
         mediaPlayer.reset()
         mediaPlayer.setDataSource(url)
         mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener { listener.onStateChanged(PlayerInteractor.PlayerState.PREPARED) }
-        mediaPlayer.setOnCompletionListener { listener.onStateChanged(PlayerInteractor.PlayerState.COMPLETED) }
+        mediaPlayer.setOnPreparedListener {
+            listener.onStateChanged(PlayerInteractor.PlayerState.PREPARED)
+        }
+        mediaPlayer.setOnCompletionListener {
+            stopProgressUpdates()
+            listener.onStateChanged(PlayerInteractor.PlayerState.COMPLETED)
+        }
     }
 
-    override fun start() = mediaPlayer.start()
-    override fun pause() = mediaPlayer.pause()
-    override fun release() = mediaPlayer.release()
+    override fun start() {
+        mediaPlayer.start()
+        startProgressUpdates()
+        progressListener?.onStateChanged(PlayerInteractor.PlayerState.PLAYING)
+    }
+
+    override fun pause() {
+        mediaPlayer.pause()
+        stopProgressUpdates()
+        progressListener?.onStateChanged(PlayerInteractor.PlayerState.PAUSED)
+    }
+
+    override fun release() {
+        stopProgressUpdates()
+        mediaPlayer.release()
+    }
+
     override fun getCurrentPosition(): Int = mediaPlayer.currentPosition
+
     override fun isPlaying(): Boolean = mediaPlayer.isPlaying
+
     override fun playPause() {
         if (mediaPlayer.isPlaying) {
-            mediaPlayer.pause()
+            pause()
         } else {
-            mediaPlayer.start()
+            start()
         }
+    }
+
+    private fun startProgressUpdates() {
+        stopProgressUpdates()
+
+        progressRunnable = object : Runnable {
+            override fun run() {
+                val position = mediaPlayer.currentPosition
+                progressListener?.onProgressUpdated(position)
+                handler.postDelayed(this, 300L)
+            }
+        }.also { handler.post(it) }
+    }
+
+    private fun stopProgressUpdates() {
+        progressRunnable?.let { handler.removeCallbacks(it) }
+        progressRunnable = null
     }
 }

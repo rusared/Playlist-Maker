@@ -1,16 +1,19 @@
 package com.example.playlistmaker.creator
 
 import android.content.Context
+import com.example.playlistmaker.main.ui.view_model.MainViewModelFactory
 import com.example.playlistmaker.settings.data.datasource.AppPreferences
 import com.example.playlistmaker.player.data.PlayerRepositoryImpl
 import com.example.playlistmaker.settings.data.repository.PreferencesRepositoryImpl
 import com.example.playlistmaker.search.data.repository.TracksRepositoryImpl
 import com.example.playlistmaker.search.data.network.RetrofitNetworkClient
-import com.example.playlistmaker.player.domain.PlayerInteractor
+import com.example.playlistmaker.player.domain.interactor.PlayerInteractor
 import com.example.playlistmaker.settings.domain.repository.PreferencesRepository
 import com.example.playlistmaker.search.domain.interactor.SearchInteractor
 import com.example.playlistmaker.search.domain.repository.TracksRepository
-import com.example.playlistmaker.player.domain.PlayerInteractorImpl
+import com.example.playlistmaker.player.domain.interactor.PlayerInteractorImpl
+import com.example.playlistmaker.player.domain.repository.PlayerRepository
+import com.example.playlistmaker.player.presentation.view_model.PlayerViewModelFactory
 import com.example.playlistmaker.search.domain.interactor.SearchHistoryInteractor
 import com.example.playlistmaker.search.domain.interactor.SearchInteractorImpl
 import com.example.playlistmaker.search.presentation.view_model.SearchViewModelFactory
@@ -36,10 +39,6 @@ object Creator {
         return SearchInteractorImpl(getTracksRepository())
     }
 
-    fun providePlayerInteractor(): PlayerInteractor {
-        return PlayerInteractorImpl(PlayerRepositoryImpl())
-    }
-
     fun providePreferencesRepository(context: Context): PreferencesRepository {
         val appPreferences = AppPreferences(context)
         return PreferencesRepositoryImpl(appPreferences)
@@ -59,6 +58,23 @@ object Creator {
     private fun provideSettingsRepository(context: Context): SettingsRepository {
         val appPreferences = AppPreferences(context)
         return SettingsRepositoryImpl(appPreferences)
+    }
+
+    // MainViewModel Factory
+    fun provideMainViewModelFactory(): MainViewModelFactory {
+        return MainViewModelFactory()
+    }
+
+    fun providePlayerInteractor(): PlayerInteractor {
+        return PlayerInteractorImpl(providePlayerRepository())
+    }
+
+    fun providePlayerRepository(): PlayerRepository {
+        return PlayerRepositoryImpl()
+    }
+
+    fun providePlayerViewModelFactory(): PlayerViewModelFactory {
+        return PlayerViewModelFactory(providePlayerInteractor())
     }
 
     // Sharing

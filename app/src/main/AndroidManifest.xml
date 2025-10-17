@@ -19,7 +19,7 @@
         tools:targetApi="35">
 
         <activity
-            android:name=".player.presentation.ui.AudioPlayerActivity"
+            android:name=".player.presentation.ui.PlayerActivity"
             android:screenOrientation="portrait"
             android:exported="false" />
         <activity

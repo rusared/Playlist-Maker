@@ -1,4 +1,4 @@
-package com.example.playlistmaker.player.domain
+package com.example.playlistmaker.player.domain.interactor
 
 interface PlayerInteractor {
     fun prepare(url: String, listener: PlayerStateListener)
