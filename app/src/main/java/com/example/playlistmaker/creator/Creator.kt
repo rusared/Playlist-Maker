@@ -14,10 +14,16 @@ import com.example.playlistmaker.search.domain.repository.TracksRepository
 import com.example.playlistmaker.player.domain.interactor.PlayerInteractorImpl
 import com.example.playlistmaker.player.domain.repository.PlayerRepository
 import com.example.playlistmaker.player.presentation.view_model.PlayerViewModelFactory
+import com.example.playlistmaker.search.data.debounce.ClickDebouncerImpl
+import com.example.playlistmaker.search.data.debounce.DebounceInteractorImpl
 import com.example.playlistmaker.search.data.repository.SearchHistoryRepositoryImpl
+import com.example.playlistmaker.search.domain.interactor.ClickDebouncer
+import com.example.playlistmaker.search.domain.interactor.DebounceInteractor
 import com.example.playlistmaker.search.domain.interactor.SearchHistoryInteractor
 import com.example.playlistmaker.search.domain.interactor.SearchInteractorImpl
+import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.search.domain.repository.SearchHistoryRepository
+import com.example.playlistmaker.search.presentation.ui.TracksAdapter
 import com.example.playlistmaker.search.presentation.view_model.SearchViewModelFactory
 import com.example.playlistmaker.settings.domain.interactor.SettingsInteractor
 import com.example.playlistmaker.settings.domain.interactor.SettingsInteractorImpl
@@ -37,8 +43,14 @@ object Creator {
         return TracksRepositoryImpl(RetrofitNetworkClient())
     }
 
+    private fun provideDebounceInteractor(): DebounceInteractor {
+        return DebounceInteractorImpl()
+    }
+
     fun provideSearchInteractor(): SearchInteractor {
-        return SearchInteractorImpl(getTracksRepository())
+        return SearchInteractorImpl(
+            getTracksRepository(),
+            provideDebounceInteractor())
     }
 
     fun providePreferencesRepository(context: Context): PreferencesRepository {

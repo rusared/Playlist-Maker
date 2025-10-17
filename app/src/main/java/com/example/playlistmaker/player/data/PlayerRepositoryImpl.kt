@@ -62,7 +62,7 @@ class PlayerRepositoryImpl : PlayerRepository {
             override fun run() {
                 val position = mediaPlayer.currentPosition
                 progressListener?.onProgressUpdated(position)
-                handler.postDelayed(this, 300L)
+                handler.postDelayed(this, PROGRESS_DEBOUNCE_DELAY)
             }
         }.also { handler.post(it) }
     }
@@ -70,5 +70,9 @@ class PlayerRepositoryImpl : PlayerRepository {
     private fun stopProgressUpdates() {
         progressRunnable?.let { handler.removeCallbacks(it) }
         progressRunnable = null
+    }
+
+    companion object {
+        private const val PROGRESS_DEBOUNCE_DELAY = 300L
     }
 }

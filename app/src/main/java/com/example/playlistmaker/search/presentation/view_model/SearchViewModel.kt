@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.playlistmaker.search.domain.interactor.SearchHistoryInteractor
 import com.example.playlistmaker.search.domain.interactor.SearchInteractor
+import com.example.playlistmaker.search.domain.interactor.SearchInteractor.SearchStatus
 import com.example.playlistmaker.search.domain.model.Track
 
 class SearchViewModel(
@@ -77,11 +78,5 @@ class SearchViewModel(
         object Empty : SearchState()
         object Error : SearchState()
         data class Content(val tracks: List<Track>) : SearchState()
-    }
-
-    enum class SearchStatus {
-        SUCCESS,
-        NOTHING_FOUND,
-        CONNECTION_PROBLEM
     }
 }

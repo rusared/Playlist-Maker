@@ -1,12 +1,12 @@
 package com.example.playlistmaker.search.domain.interactor
 
 import com.example.playlistmaker.search.domain.repository.TracksRepository
-import com.example.playlistmaker.search.presentation.view_model.SearchViewModel.SearchStatus
+import com.example.playlistmaker.search.domain.interactor.SearchInteractor.SearchStatus
 import java.util.concurrent.Executors
 
 class SearchInteractorImpl(
     private val repository: TracksRepository,
-    private val debounceInteractor: DebounceInteractor = DebounceInteractor()
+    private val debounceInteractor: DebounceInteractor
 ) : SearchInteractor {
 
     private val executor = Executors.newCachedThreadPool()

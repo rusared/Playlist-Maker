@@ -21,6 +21,8 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.player.presentation.ui.PlayerActivity
+import com.example.playlistmaker.search.data.debounce.ClickDebouncerImpl
+import com.example.playlistmaker.search.domain.interactor.ClickDebouncer
 import com.example.playlistmaker.search.presentation.view_model.SearchViewModel
 import com.example.playlistmaker.search.presentation.view_model.SearchViewModel.SearchState
 import com.google.android.material.appbar.MaterialToolbar
@@ -43,6 +45,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var tracksAdapter: TracksAdapter
     private lateinit var tracksHistoryAdapter: TracksAdapter
 
+    private lateinit var clickDebouncer: ClickDebouncer
+
     private val viewModel: SearchViewModel by viewModels {
         Creator.provideSearchViewModelFactory(this)
     }
@@ -52,6 +56,8 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        clickDebouncer = provideClickDebouncer()
 
         initViews()
         setupAdapters()
@@ -89,13 +95,24 @@ class SearchActivity : AppCompatActivity() {
             viewModel.addTrackToHistory(track)
         }
 
-        tracksAdapter = TracksAdapter(emptyList(), trackClickListener)
-        tracksHistoryAdapter = TracksAdapter(emptyList(), trackClickListener)
+        tracksAdapter = TracksAdapter(emptyList(), trackClickListener, clickDebouncer)
+        tracksHistoryAdapter = TracksAdapter(emptyList(), trackClickListener, clickDebouncer)
 
         tracksList.layoutManager = LinearLayoutManager(this)
         tracksHistoryList.layoutManager = LinearLayoutManager(this)
         tracksList.adapter = tracksAdapter
         tracksHistoryList.adapter = tracksHistoryAdapter
+    }
+
+    private fun provideClickDebouncer(): ClickDebouncer {
+        return ClickDebouncerImpl()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        clickDebouncer.reset()
+        tracksAdapter.onDestroy()
+        tracksHistoryAdapter.onDestroy()
     }
 
     private fun setupObservers() {

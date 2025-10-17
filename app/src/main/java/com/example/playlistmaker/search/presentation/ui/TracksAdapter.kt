@@ -1,14 +1,14 @@
 package com.example.playlistmaker.search.presentation.ui
 
-import android.os.Handler
-import android.os.Looper
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.search.domain.interactor.ClickDebouncer
 import com.example.playlistmaker.search.domain.model.Track
 
 class TracksAdapter(
     private var tracks: List<Track>,
-    private val clickListener: (Track) -> Unit
+    private val clickListener: (Track) -> Unit,
+    private val clickDebouncer: ClickDebouncer
 ) : RecyclerView.Adapter<TrackViewHolder> () {
 
 
@@ -20,7 +20,9 @@ class TracksAdapter(
         holder.bind(tracks[position])
 
         holder.itemView.setOnClickListener {
-            if (clickDebounce()) clickListener(tracks[position])
+            if (clickDebouncer.isClickAllowed()) {
+                clickListener(tracks[position])
+            }
         }
     }
 
@@ -31,20 +33,11 @@ class TracksAdapter(
         notifyDataSetChanged()
     }
 
-    private var isClickAllowed = true
-    private val handler = Handler(Looper.getMainLooper())
-
-    private fun clickDebounce(): Boolean {
-        val current = isClickAllowed
-        if (isClickAllowed) {
-            isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
-        }
-        return current
+    fun onDestroy() {
+        clickDebouncer.reset()
     }
 
     companion object {
-        private const val CLICK_DEBOUNCE_DELAY = 1000L
         const val TRACK = "TRACK"
     }
 }
