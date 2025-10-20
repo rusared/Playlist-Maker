@@ -21,8 +21,8 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.player.presentation.ui.PlayerActivity
-import com.example.playlistmaker.search.data.debounce.ClickDebouncerImpl
-import com.example.playlistmaker.search.domain.interactor.ClickDebouncer
+import com.example.playlistmaker.search.presentation.debounce.ClickDebouncerImpl
+import com.example.playlistmaker.search.presentation.debounce.ClickDebouncer
 import com.example.playlistmaker.search.presentation.view_model.SearchViewModel
 import com.example.playlistmaker.search.presentation.view_model.SearchViewModel.SearchState
 import com.google.android.material.appbar.MaterialToolbar

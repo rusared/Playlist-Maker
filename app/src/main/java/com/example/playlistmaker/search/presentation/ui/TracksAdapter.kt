@@ -2,7 +2,7 @@ package com.example.playlistmaker.search.presentation.ui
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.search.domain.interactor.ClickDebouncer
+import com.example.playlistmaker.search.presentation.debounce.ClickDebouncer
 import com.example.playlistmaker.search.domain.model.Track
 
 class TracksAdapter(

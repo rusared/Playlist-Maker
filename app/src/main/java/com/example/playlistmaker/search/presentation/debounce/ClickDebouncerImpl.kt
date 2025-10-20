@@ -1,8 +1,7 @@
-package com.example.playlistmaker.search.data.debounce
+package com.example.playlistmaker.search.presentation.debounce
 
 import android.os.Handler
 import android.os.Looper
-import com.example.playlistmaker.search.domain.interactor.ClickDebouncer
 
 class ClickDebouncerImpl : ClickDebouncer {
 

@@ -1,4 +1,4 @@
-package com.example.playlistmaker.search.domain.interactor
+package com.example.playlistmaker.search.presentation.debounce
 
 interface ClickDebouncer {
     fun isClickAllowed(): Boolean
