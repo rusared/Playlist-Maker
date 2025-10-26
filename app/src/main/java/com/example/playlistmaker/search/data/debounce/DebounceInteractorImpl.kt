@@ -1,11 +1,12 @@
 package com.example.playlistmaker.search.data.debounce
 
 import android.os.Handler
-import android.os.Looper
 import com.example.playlistmaker.search.domain.interactor.DebounceInteractor
 
-class DebounceInteractorImpl : DebounceInteractor {
-    private val handler = Handler(Looper.getMainLooper())
+class DebounceInteractorImpl(
+    private val handler: Handler
+) : DebounceInteractor {
+
     private var searchRunnable: Runnable? = null
 
     override fun debounce(delay: Long, action: () -> Unit) {

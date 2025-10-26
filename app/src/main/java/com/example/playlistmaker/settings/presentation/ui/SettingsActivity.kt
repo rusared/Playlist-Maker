@@ -1,22 +1,19 @@
 package com.example.playlistmaker.settings.presentation.ui
 
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
 import com.example.playlistmaker.settings.presentation.view_model.SettingsViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
     private var isFromUserInteraction = false
 
-    private val viewModel: SettingsViewModel by viewModels {
-        Creator.provideSettingsViewModelFactory(this)
-    }
+    private val vm by viewModel<SettingsViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,26 +24,25 @@ class SettingsActivity : AppCompatActivity() {
         binding.settingsBackButton.setNavigationOnClickListener { finish() }
 
         binding.themeSwitcher.setOnCheckedChangeListener(null)
-        binding.themeSwitcher.isChecked = viewModel.observeThemeState.value?.isDarkTheme ?: false
+        binding.themeSwitcher.isChecked = vm.observeThemeState.value?.isDarkTheme ?: false
 
         binding.themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
             if (isFromUserInteraction) {
-                viewModel.onThemeChanged(isChecked)
+                vm.onThemeChanged(isChecked)
             }
         }
 
-        binding.shareButton.setOnClickListener { viewModel.onShareAppClicked() }
-        binding.supportButton.setOnClickListener { viewModel.onSupportClicked() }
-        binding.agreementButton.setOnClickListener { viewModel.onAgreementClicked() }
+        binding.shareButton.setOnClickListener { vm.onShareAppClicked() }
+        binding.supportButton.setOnClickListener { vm.onSupportClicked() }
+        binding.agreementButton.setOnClickListener { vm.onAgreementClicked() }
         setupObservers()
     }
 
     private fun setupObservers() {
-        viewModel.observeThemeState.observe(this, Observer { themeSettings ->
+        vm.observeThemeState.observe(this, Observer { themeSettings ->
             isFromUserInteraction = false
             binding.themeSwitcher.isChecked = themeSettings.isDarkTheme
             isFromUserInteraction = true
-
             applyTheme(themeSettings.isDarkTheme)
         })
     }

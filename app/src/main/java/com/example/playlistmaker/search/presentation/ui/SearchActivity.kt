@@ -7,31 +7,26 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.player.presentation.ui.PlayerActivity
-import com.example.playlistmaker.search.presentation.debounce.ClickDebouncerImpl
 import com.example.playlistmaker.search.presentation.debounce.ClickDebouncer
 import com.example.playlistmaker.search.presentation.view_model.SearchViewModel
 import com.example.playlistmaker.search.presentation.view_model.SearchViewModel.SearchState
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySearchBinding
-
     private lateinit var tracksAdapter: TracksAdapter
     private lateinit var tracksHistoryAdapter: TracksAdapter
 
-    private lateinit var clickDebouncer: ClickDebouncer
-
-    private val viewModel: SearchViewModel by viewModels {
-        Creator.provideSearchViewModelFactory(this)
-    }
+    private val clickDebouncer: ClickDebouncer by inject()
+    private val vm by viewModel<SearchViewModel>()
 
     private var valueEditText: String? = null
 
@@ -41,8 +36,6 @@ class SearchActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.searchBackButton)
-
-        clickDebouncer = provideClickDebouncer()
 
         setupAdapters()
         setupObservers()
@@ -58,7 +51,7 @@ class SearchActivity : AppCompatActivity() {
                 putExtra(TracksAdapter.TRACK, track)
             }
             startActivity(intent)
-            viewModel.addTrackToHistory(track)
+            vm.addTrackToHistory(track)
         }
 
         tracksAdapter = TracksAdapter(emptyList(), trackClickListener, clickDebouncer)
@@ -70,10 +63,6 @@ class SearchActivity : AppCompatActivity() {
         binding.trackHistoryList.adapter = tracksHistoryAdapter
     }
 
-    private fun provideClickDebouncer(): ClickDebouncer {
-        return ClickDebouncerImpl()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         clickDebouncer.reset()
@@ -82,11 +71,11 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.observeState.observe(this) { state ->
+        vm.observeState.observe(this) { state ->
             handleSearchState(state)
         }
 
-        viewModel.observeHistory.observe(this) { history ->
+        vm.observeHistory.observe(this) { history ->
             handleHistory(history)
         }
     }
@@ -129,7 +118,7 @@ class SearchActivity : AppCompatActivity() {
     private fun setupClickListeners() {
         binding.clearIcon.setOnClickListener {
             binding.queryInput.setText("")
-            viewModel.clearSearch()
+            vm.clearSearch()
             hideKeyboard()
         }
 
@@ -138,14 +127,13 @@ class SearchActivity : AppCompatActivity() {
         }
 
         binding.trackHistoryClear.setOnClickListener {
-            viewModel.clearSearchHistory()
+            vm.clearSearchHistory()
         }
 
         binding.searchBackButton.setNavigationOnClickListener {
             finish()
         }
     }
-
 
     private fun setupTextWatcher() {
         val simpleTextWatcher = object : TextWatcher {
@@ -156,12 +144,12 @@ class SearchActivity : AppCompatActivity() {
                 valueEditText = s?.toString()
 
                 if (s.isNullOrEmpty()) {
-                    viewModel.cancelSearch()
-                    viewModel.clearSearch()
-                    viewModel.loadSearchHistory()
+                    vm.cancelSearch()
+                    vm.clearSearch()
+                    vm.loadSearchHistory()
                     showSearchHistory()
                 } else {
-                    viewModel.searchDebounce(s.toString())
+                    vm.searchDebounce(s.toString())
                 }
             }
 
@@ -173,7 +161,7 @@ class SearchActivity : AppCompatActivity() {
         binding.queryInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 if (binding.queryInput.text.isNotEmpty()) {
-                    viewModel.cancelSearch()
+                    vm.cancelSearch()
                     performSearch()
                 }
                 true
@@ -184,7 +172,7 @@ class SearchActivity : AppCompatActivity() {
 
         binding.queryInput.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus && binding.queryInput.text.isEmpty()) {
-                viewModel.loadSearchHistory()
+                vm.loadSearchHistory()
             }
         }
     }
@@ -192,12 +180,12 @@ class SearchActivity : AppCompatActivity() {
     private fun performSearch() {
         val query = binding.queryInput.text.toString()
         if (query.isNotEmpty()) {
-            viewModel.searchTracksImmediately(query)
+            vm.searchTracksImmediately(query)
         }
     }
 
     private fun showSearchHistory() {
-        val hasHistory = !viewModel.observeHistory.value.isNullOrEmpty()
+        val hasHistory = !vm.observeHistory.value.isNullOrEmpty()
         binding.trackHistory.visibility = if (hasHistory && binding.queryInput.text.isEmpty()) View.VISIBLE else View.GONE
     }
 
@@ -239,7 +227,7 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.loadSearchHistory()
+        vm.loadSearchHistory()
     }
 
     companion object {

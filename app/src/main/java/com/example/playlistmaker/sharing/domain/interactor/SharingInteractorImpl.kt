@@ -1,11 +1,13 @@
 package com.example.playlistmaker.sharing.domain.interactor
 
+import android.content.Context
 import com.example.playlistmaker.sharing.domain.repository.ExternalNavigator
 import com.example.playlistmaker.sharing.domain.repository.SharingRepository
 
 class SharingInteractorImpl(
     private val externalNavigator: ExternalNavigator,
-    private val sharingRepository: SharingRepository
+    private val sharingRepository: SharingRepository,
+    private val context: Context
 ) : SharingInteractor {
 
     override fun shareApp() {

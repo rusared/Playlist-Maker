@@ -1,30 +1,35 @@
 package com.example.playlistmaker
 
 import android.app.Application
-import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.di.dataModule
+import com.example.playlistmaker.di.interactorModule
+import com.example.playlistmaker.di.repositoryModule
+import com.example.playlistmaker.di.viewModelModule
 import com.example.playlistmaker.settings.domain.interactor.SettingsInteractor
+import org.koin.android.ext.android.inject
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 
 class App : Application() {
-
-    private lateinit var settingsInteractor: SettingsInteractor
 
     override fun onCreate() {
         super.onCreate()
 
-        // Глобальный обработчик непойманных исключений
-        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-            Log.e("App", "Uncaught exception in thread: ${thread.name}", throwable)
-            throwable.printStackTrace()
-            // Можно добавить отправку ошибки в аналитику
+        startKoin {
+            androidContext(this@App)
+            modules(
+                dataModule,
+                repositoryModule,
+                interactorModule,
+                viewModelModule
+            )
         }
-
-        settingsInteractor = Creator.provideSettingsInteractor(this)
         applyTheme()
     }
 
     private fun applyTheme() {
+        val settingsInteractor: SettingsInteractor by inject()
         val themeSettings = settingsInteractor.getThemeSettings()
         if (themeSettings.isThemeSet) {
             if (themeSettings.isDarkTheme) {
