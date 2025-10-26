@@ -1,9 +1,9 @@
 package com.example.playlistmaker.player.presentation.ui
 
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
@@ -79,12 +79,12 @@ class PlayerActivity : AppCompatActivity() {
         binding.artistName.text = track.artistName
 
         if (track.collectionName.isNullOrEmpty()) {
-            binding.album.visibility = View.GONE
-            binding.albumValue.visibility = View.GONE
+            binding.album.isVisible = false
+            binding.albumValue.isVisible = false
         } else {
             binding.albumValue.text = track.collectionName
-            binding.album.visibility = View.VISIBLE
-            binding.albumValue.visibility = View.VISIBLE
+            binding.album.isVisible = true
+            binding.albumValue.isVisible = true
         }
 
         binding.yearValue.text =

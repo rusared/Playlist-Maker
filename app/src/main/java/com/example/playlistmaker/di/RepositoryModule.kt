@@ -45,5 +45,4 @@ val repositoryModule = module {
     single<SharingRepository> {
         SharingRepositoryImpl(get())
     }
-
 }

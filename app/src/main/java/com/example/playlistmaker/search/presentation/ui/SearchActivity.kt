@@ -4,10 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySearchBinding
@@ -81,9 +81,9 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun handleSearchState(state: SearchState) {
-        binding.progressBar.visibility = if (state is SearchState.Loading) View.VISIBLE else View.GONE
-        binding.tracksList.visibility = if (state is SearchState.Content) View.VISIBLE else View.GONE
-        binding.placeholderMessage.visibility = if (state is SearchState.Empty || state is SearchState.Error) View.VISIBLE else View.GONE
+        binding.progressBar.isVisible = state is SearchState.Loading
+        binding.tracksList.isVisible = state is SearchState.Content
+        binding.placeholderMessage.isVisible = state is SearchState.Empty || state is SearchState.Error
 
         when (state) {
             is SearchState.Default -> {
@@ -112,7 +112,7 @@ class SearchActivity : AppCompatActivity() {
         val shouldShowHistory = history.isNotEmpty() &&
                 binding.queryInput.text.isEmpty() &&
                 binding.queryInput.hasFocus()
-        binding.trackHistory.visibility = if (shouldShowHistory) View.VISIBLE else View.GONE
+        binding.trackHistory.isVisible = shouldShowHistory
     }
 
     private fun setupClickListeners() {
@@ -140,7 +140,7 @@ class SearchActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                binding.clearIcon.visibility = clearButtonVisibility(s)
+                binding.clearIcon.isVisible = !s.isNullOrEmpty()
                 valueEditText = s?.toString()
 
                 if (s.isNullOrEmpty()) {
@@ -186,27 +186,23 @@ class SearchActivity : AppCompatActivity() {
 
     private fun showSearchHistory() {
         val hasHistory = !vm.observeHistory.value.isNullOrEmpty()
-        binding.trackHistory.visibility = if (hasHistory && binding.queryInput.text.isEmpty()) View.VISIBLE else View.GONE
+        binding.trackHistory.isVisible = (hasHistory && binding.queryInput.text.isEmpty())
     }
 
     private fun hideSearchHistory() {
-        binding.trackHistory.visibility = View.GONE
+        binding.trackHistory.isVisible = false
     }
 
     private fun showEmptyState() {
         binding.placeholderMessageText.text = getString(R.string.nothing_found)
         binding.placeholderMessageImage.setImageResource(R.drawable.nothing_found_placeholder)
-        binding.placeholderMessageButton.visibility = View.GONE
+        binding.placeholderMessageButton.isVisible = false
     }
 
     private fun showErrorState() {
         binding.placeholderMessageText.text = getString(R.string.connection_problem)
         binding.placeholderMessageImage.setImageResource(R.drawable.connection_problem_placeholder)
-        binding.placeholderMessageButton.visibility = View.VISIBLE
-    }
-
-    private fun clearButtonVisibility(s: CharSequence?): Int {
-        return if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+        binding.placeholderMessageButton.isVisible = true
     }
 
     private fun hideKeyboard() {
