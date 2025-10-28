@@ -1,63 +1,48 @@
 package com.example.playlistmaker.settings.presentation.ui
 
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
-import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.databinding.ActivitySettingsBinding
 import com.example.playlistmaker.settings.presentation.view_model.SettingsViewModel
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.switchmaterial.SwitchMaterial
-import com.google.android.material.textview.MaterialTextView
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
-    private lateinit var themeSwitcher: SwitchMaterial
+
+    private lateinit var binding: ActivitySettingsBinding
     private var isFromUserInteraction = false
 
-    private val viewModel: SettingsViewModel by viewModels {
-        Creator.provideSettingsViewModelFactory(this)
-    }
+    private val vm by viewModel<SettingsViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        initViews()
-        setupObservers()
-    }
+        setSupportActionBar(binding.settingsBackButton)
+        binding.settingsBackButton.setNavigationOnClickListener { finish() }
 
-    private fun initViews() {
-        val backButton = findViewById<MaterialToolbar>(R.id.mt_back_button)
-        themeSwitcher = findViewById(R.id.sm_theme_switcher)
-        val shareButton = findViewById<MaterialTextView>(R.id.mtv_share_button)
-        val supportButton = findViewById<MaterialTextView>(R.id.mtv_support_button)
-        val agreementButton = findViewById<MaterialTextView>(R.id.mtv_agreement_button)
+        binding.themeSwitcher.setOnCheckedChangeListener(null)
+        binding.themeSwitcher.isChecked = vm.observeThemeState.value?.isDarkTheme ?: false
 
-        setSupportActionBar(backButton)
-        backButton.setNavigationOnClickListener { finish() }
-
-        themeSwitcher.setOnCheckedChangeListener(null)
-        themeSwitcher.isChecked = viewModel.observeThemeState.value?.isDarkTheme ?: false
-
-        themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
+        binding.themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
             if (isFromUserInteraction) {
-                viewModel.onThemeChanged(isChecked)
+                vm.onThemeChanged(isChecked)
             }
         }
 
-        shareButton.setOnClickListener { viewModel.onShareAppClicked() }
-        supportButton.setOnClickListener { viewModel.onSupportClicked() }
-        agreementButton.setOnClickListener { viewModel.onAgreementClicked() }
+        binding.shareButton.setOnClickListener { vm.onShareAppClicked() }
+        binding.supportButton.setOnClickListener { vm.onSupportClicked() }
+        binding.agreementButton.setOnClickListener { vm.onAgreementClicked() }
+        setupObservers()
     }
 
     private fun setupObservers() {
-        viewModel.observeThemeState.observe(this, Observer { themeSettings ->
+        vm.observeThemeState.observe(this, Observer { themeSettings ->
             isFromUserInteraction = false
-            themeSwitcher.isChecked = themeSettings.isDarkTheme
+            binding.themeSwitcher.isChecked = themeSettings.isDarkTheme
             isFromUserInteraction = true
-
             applyTheme(themeSettings.isDarkTheme)
         })
     }

@@ -28,7 +28,7 @@ class PlayerViewModel(
 
     fun setTrack(track: Track) {
         currentTrack = track
-        trackDuration.postValue(formatTime(track.trackTimeMillis.toIntOrNull() ?: 0))
+        trackDuration.postValue(track.trackTimeMillis)
     }
 
     fun preparePlayer() {

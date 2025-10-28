@@ -1,12 +1,10 @@
 package com.example.playlistmaker.settings.data.datasource
 
-import android.content.Context
 import android.content.SharedPreferences
 
-class AppPreferences(context: Context) {
-    val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, Context.MODE_PRIVATE)
-
+class AppPreferences(
+    private val sharedPreferences: SharedPreferences
+) {
     var isThemeSet: Boolean
         get() = sharedPreferences.getBoolean(IS_THEME_SET_KEY, false)
         set(value) = sharedPreferences.edit().putBoolean(IS_THEME_SET_KEY, value).apply()

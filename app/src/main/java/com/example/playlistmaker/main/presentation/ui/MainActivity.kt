@@ -2,66 +2,54 @@ package com.example.playlistmaker.main.presentation.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.databinding.ActivityMainBinding
 import com.example.playlistmaker.search.presentation.ui.SearchActivity
 import com.example.playlistmaker.settings.presentation.ui.SettingsActivity
 import com.example.playlistmaker.library.ui.LibraryActivity
 import com.example.playlistmaker.main.presentation.view_model.MainViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var searchButton: Button
-    private lateinit var libraryButton: Button
-    private lateinit var settingsButton: Button
+    private lateinit var binding: ActivityMainBinding
 
-    private val viewModel: MainViewModel by viewModels {
-        Creator.provideMainViewModelFactory()
-    }
+    private val vm by viewModel<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        initViews()
         setupClickListeners()
         observeNavigationEvents()
     }
 
-    private fun initViews() {
-        searchButton = findViewById(R.id.main_search_button)
-        libraryButton = findViewById(R.id.main_library_button)
-        settingsButton = findViewById(R.id.main_settings_button)
-    }
-
     private fun setupClickListeners() {
 
-        searchButton.setOnClickListener {
-            viewModel.onSearchClicked()
+        binding.mainSearchButton.setOnClickListener {
+            vm.onSearchClicked()
         }
 
-        libraryButton.setOnClickListener {
-            viewModel.onLibraryClicked()
+        binding.mainLibraryButton.setOnClickListener {
+            vm.onLibraryClicked()
         }
 
-        settingsButton.setOnClickListener {
-            viewModel.onSettingsClicked()
+        binding.mainSettingsButton.setOnClickListener {
+            vm.onSettingsClicked()
         }
     }
 
     private fun observeNavigationEvents() {
-        viewModel.observeSearchClicked.observe(this) {
+        vm.observeSearchClicked.observe(this) {
             navigateToSearch()
         }
 
-        viewModel.observeLibraryClicked.observe(this) {
+        vm.observeLibraryClicked.observe(this) {
             navigateToLibrary()
         }
 
-        viewModel.observeSettingsClicked.observe(this) {
+        vm.observeSettingsClicked.observe(this) {
             navigateToSettings()
         }
     }

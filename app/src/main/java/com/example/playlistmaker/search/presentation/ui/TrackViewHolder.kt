@@ -1,40 +1,34 @@
 package com.example.playlistmaker.search.presentation.ui
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
+import com.example.playlistmaker.databinding.TrackViewBinding
 import com.example.playlistmaker.search.domain.model.Track
 
-class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-    companion object {
-        fun create(parent: ViewGroup): TrackViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.track_view, parent, false)
-            return TrackViewHolder(view)
-        }
-    }
-
-    private val trackNameView: TextView = itemView.findViewById(R.id.tv_track_name)
-    private val artistNameView: TextView = itemView.findViewById(R.id.tv_artist_name)
-    private val trackTimeView: TextView = itemView.findViewById(R.id.tv_track_time)
-    private val artworkView: ImageView = itemView.findViewById(R.id.iv_artwork)
+class TrackViewHolder(private val binding: TrackViewBinding) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(track: Track) {
-        trackNameView.text = track.trackName
-        artistNameView.text = track.artistName
-        trackTimeView.text = track.trackTimeMillis
+        binding.trackName.text = track.trackName
+        binding.artistName.text = track.artistName
+        binding.trackTime.text = track.trackTimeMillis
 
         Glide.with(itemView)
             .load(track.artworkUrl100)
             .placeholder(R.drawable.album_placeholder)
             .fitCenter()
             .transform(RoundedCorners(2))
-            .into(artworkView)
+            .into(binding.artwork)
+    }
+
+    companion object {
+        fun create(parent: ViewGroup): TrackViewHolder {
+            val inflater = LayoutInflater.from(parent.context)
+            val binding = TrackViewBinding.inflate(inflater, parent, false)
+            return TrackViewHolder(binding)
+        }
     }
 }
